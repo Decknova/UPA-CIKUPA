@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramadan Tracker Group</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
+        .task-card.active { background-color: #059669; border-color: #10b981; transform: scale(0.98); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        #chartModal { display: none; }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen pb-10">
+
+    <div class="max-w-md mx-auto px-5">
+        <header class="flex justify-between items-center py-8">
+            <div>
+                <h1 class="text-2xl font-extrabold text-emerald-400 italic">RAMADAN<span class="text-white">TRACKER</span></h1>
+                <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Ibadah Crew</p>
+            </div>
+            <button onclick="openChart()" class="bg-slate-800 p-3 rounded-2xl shadow-lg border border-slate-700 active:scale-90 transition">
+                📊 <span class="text-xs ml-1 font-bold">GRAFIK</span>
+            </button>
+        </header>
+
+        <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-8">
+            <label class="block mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500">Pilih Nama Kamu</label>
+            <select id="userSelect" onchange="switchUser()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 appearance-none shadow-inner">
+                <option value="Arif">Arif</option>
+                <option value="Heru">Heru</option>
+                <option value="Fajar">Fajar</option>
+                <option value="Faisal">Faisal</option>
+                <option value="Mulyadi">Mulyadi</option>
+                <option value="Yudi">Yudi</option>
+                <option value="Kang Deny">Kang Deny</option>
+            </select>
+        </div>
+
+        <div class="flex space-x-3 overflow-x-auto mb-8 no-scrollbar">
+            <button class="flex-shrink-0 bg-emerald-600 px-6 py-2 rounded-xl text-xs font-bold shadow-lg shadow-emerald-500/20">AHAD</button>
+            <button class="flex-shrink-0 bg-slate-900 border border-slate-800 px-6 py-2 rounded-xl text-xs font-bold opacity-50">SENIN</button>
+            <button class="flex-shrink-0 bg-slate-900 border border-slate-800 px-6 py-2 rounded-xl text-xs font-bold opacity-50">SELASA</button>
+            </div>
+
+        <div id="taskSection" class="space-y-6">
+            <div>
+                <h3 class="text-emerald-400 text-xs font-black mb-4 tracking-tighter uppercase border-l-4 border-emerald-500 pl-3">Sholat Berjamaah</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    <div onclick="toggleTask(this)" data-task="shubuh" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
+                        <span class="font-bold text-slate-300">Jamaah Shubuh</span>
+                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="dzuhur" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
+                        <span class="font-bold text-slate-300">Jamaah Dzuhur</span>
+                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="ashar" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
+                        <span class="font-bold text-slate-300">Jamaah Ashar</span>
+                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="maghrib" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
+                        <span class="font-bold text-slate-300">Jamaah Maghrib</span>
+                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="isya" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
+                        <span class="font-bold text-slate-300">Jamaah Isya</span>
+                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-yellow-500 text-xs font-black mb-4 tracking-tighter uppercase border-l-4 border-yellow-500 pl-3">Ibadah Sunnah</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    <div onclick="toggleTask(this)" data-task="tilawah" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
+                        <span class="font-bold text-slate-300">Tilawah Quran</span>
+                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="dhuha" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
+                        <span class="font-bold text-slate-300">Sholat Dhuha</span>
+                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="saveProgres()" class="w-full mt-10 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black py-5 rounded-3xl shadow-xl shadow-emerald-900/40 active:scale-95 transition uppercase tracking-widest italic">
+            Simpan Target Hari Ini
+        </button>
+    </div>
+
+    <div id="chartModal" class="fixed inset-0 bg-slate-950/95 z-50 p-6 flex flex-col">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-xl font-black">PROGRES GRUP</h2>
+            <button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-full font-bold">X</button>
+        </div>
+        <div class="bg-slate-900 p-4 rounded-3xl border border-slate-800 flex-grow flex items-center">
+            <canvas id="progressChart"></canvas>
+        </div>
+        <p class="text-center text-slate-500 text-[10px] mt-6 tracking-widest uppercase italic">Update Real-Time Member</p>
+    </div>
+
+    <script>
+        // Data Member
+        const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
+        let db = JSON.parse(localStorage.getItem('ramadan_crew')) || {
+            "Arif": 0, "Heru": 0, "Fajar": 0, "Faisal": 0, "Mulyadi": 0, "Yudi": 0, "Kang Deny": 0
+        };
+
+        let currentChart;
+
+        function toggleTask(el) {
+            el.classList.toggle('active');
+            const box = el.querySelector('.box');
+            if(el.classList.contains('active')) {
+                box.innerHTML = '✔';
+                box.classList.add('bg-emerald-500', 'border-emerald-500');
+            } else {
+                box.innerHTML = '';
+                box.classList.remove('bg-emerald-500', 'border-emerald-500');
+            }
+        }
+
+        function switchUser() {
+            // Reset centang di layar setiap ganti user agar tidak membingungkan
+            document.querySelectorAll('.task-card').forEach(c => {
+                c.classList.remove('active');
+                const box = c.querySelector('.box');
+                box.innerHTML = '';
+                box.classList.remove('bg-emerald-500', 'border-emerald-500');
+            });
+        }
+
+        function saveProgres() {
+            const currentUser = document.getElementById('userSelect').value;
+            const count = document.querySelectorAll('.active').length;
+            
+            db[currentUser] = count;
+            localStorage.setItem('ramadan_crew', JSON.stringify(db));
+            
+            alert(`Masyallah, ${currentUser}! Progres kamu: ${count} tugas tersimpan.`);
+        }
+
+        function openChart() {
+            document.getElementById('chartModal').style.display = 'flex';
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            
+            if(currentChart) currentChart.destroy();
+
+            currentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: names,
+                    datasets: [{
+                        label: 'Tugas Selesai',
+                        data: names.map(n => db[n]),
+                        backgroundColor: '#10b981',
+                        borderRadius: 12,
+                        barThickness: 25
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, max: 7, grid: { color: '#1e293b' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function closeChart() {
+            document.getElementById('chartModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
