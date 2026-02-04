@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Group v3</title>
+    <title>Ramadan Tracker Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        #chartModal { display: none; }
-        .day-btn.active { background-color: #10b981; color: #020617; transform: scale(1.1); font-weight: 800; }
         .task-card.active { border-color: #10b981; background-color: #064e3b; }
+        .folder-content { display: none; }
+        .folder-content.open { display: block; }
+        #chartModal, #calendarModal { display: none; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen pb-20">
@@ -20,15 +22,18 @@
     <div class="max-w-md mx-auto px-5">
         <header class="flex justify-between items-center py-8">
             <div>
-                <h1 class="text-2xl font-extrabold text-emerald-400 italic uppercase">Ramadan<span class="text-white">Tracker</span></h1>
-                <p id="currentDateDisplay" class="text-slate-500 text-[10px] font-bold tracking-widest uppercase">Ahad, 1 Ramadan</p>
+                <h1 class="text-2xl font-extrabold text-emerald-400 italic uppercase tracking-tighter">Ramadan<span class="text-white">Tracker</span></h1>
+                <div onclick="openCalendar()" class="flex items-center space-x-2 mt-1 cursor-pointer group">
+                    <p id="currentDateDisplay" class="text-slate-400 text-[11px] font-bold tracking-widest uppercase group-hover:text-emerald-400 transition"></p>
+                    <span class="text-[10px]">📅</span>
+                </div>
             </div>
             <button onclick="openChart()" class="bg-slate-900 p-3 rounded-2xl shadow-lg border border-slate-800 active:scale-90 transition">
-                📊 <span class="text-xs ml-1 font-bold">GRAFIK</span>
+                📊 <span class="text-xs ml-1 font-bold italic text-emerald-400">GRAFIK</span>
             </button>
         </header>
 
-        <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-6">
+        <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-6 shadow-xl">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Anggota Kelompok</label>
             <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 appearance-none shadow-inner">
                 <option value="Arif">Arif</option>
@@ -41,183 +46,141 @@
             </select>
         </div>
 
-        <div id="dayNavigation" class="flex space-x-3 overflow-x-auto mb-8 pb-4 no-scrollbar">
+        <div class="space-y-4">
+            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg">
+                <button onclick="toggleFolder('folderSholat')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
+                    <span class="font-black text-[11px] tracking-widest text-emerald-400 uppercase">Sholat & Rawatib</span>
+                    <span id="icon-folderSholat" class="text-xs">▼</span>
+                </button>
+                <div id="folderSholat" class="folder-content p-4 space-y-2 bg-slate-950/50">
+                    <div onclick="toggleTask(this)" data-task="j_shubuh" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800">
+                        <span class="text-sm font-semibold text-slate-300">Jamaah Shubuh</span>
+                        <div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="q_shubuh" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800 italic opacity-80">
+                        <span class="text-sm text-slate-400">Qobliyah Shubuh</span>
+                        <div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="j_dzuhur" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800"><span class="text-sm font-semibold text-slate-300">Jamaah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="q_dzuhur" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800 italic opacity-80"><span class="text-sm text-slate-400">Qobliyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="b_dzuhur" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800 italic opacity-80"><span class="text-sm text-slate-400">Ba'diyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="j_ashar" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800"><span class="text-sm font-semibold text-slate-300">Jamaah Ashar</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="j_maghrib" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800"><span class="text-sm font-semibold text-slate-300">Jamaah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="b_maghrib" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800 italic opacity-80"><span class="text-sm text-slate-400">Ba'diyah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="j_isya" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800"><span class="text-sm font-semibold text-slate-300">Jamaah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="b_isya" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800 italic opacity-80"><span class="text-sm text-slate-400">Ba'diyah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                </div>
             </div>
 
-        <div id="taskSection" class="space-y-6">
-            <h3 class="text-xs font-black mb-4 tracking-widest uppercase border-l-4 border-emerald-500 pl-3 text-emerald-400">Daftar Amalan Harian</h3>
-            
-            <div id="taskList" class="grid grid-cols-1 gap-3">
-                <div onclick="toggleTask(this)" data-task="shubuh" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all">
-                    <span class="font-bold text-slate-300">Jamaah & Rawatib Shubuh</span>
-                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
+            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg">
+                <button onclick="toggleFolder('folderSunnah')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
+                    <span class="font-black text-[11px] tracking-widest text-yellow-500 uppercase tracking-tighter">Sunnah Nawafil</span>
+                    <span id="icon-folderSunnah" class="text-xs">▼</span>
+                </button>
+                <div id="folderSunnah" class="folder-content p-4 space-y-2 bg-slate-950/50">
+                    <div onclick="toggleTask(this)" data-task="dhuha" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800"><span class="text-sm font-semibold text-slate-300">Dhuha</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="tahajud" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800"><span class="text-sm font-semibold text-slate-300">Tahajud</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="witir" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center cursor-pointer border border-slate-800"><span class="text-sm font-semibold text-slate-300">Witir</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                 </div>
-                <div onclick="toggleTask(this)" data-task="dzuhur" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all">
-                    <span class="font-bold text-slate-300">Jamaah & Rawatib Dzuhur</span>
-                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
-                </div>
-                <div onclick="toggleTask(this)" data-task="ashar" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all">
-                    <span class="font-bold text-slate-300">Jamaah Ashar</span>
-                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
-                </div>
-                <div onclick="toggleTask(this)" data-task="maghrib" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all">
-                    <span class="font-bold text-slate-300">Jamaah & Rawatib Maghrib</span>
-                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
-                </div>
-                <div onclick="toggleTask(this)" data-task="isya" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all">
-                    <span class="font-bold text-slate-300">Jamaah & Rawatib Isya</span>
-                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
-                </div>
-                <div onclick="toggleTask(this)" data-task="dhuha" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all text-yellow-500">
-                    <span class="font-bold uppercase text-[12px]">Sholat Dhuha</span>
-                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
-                </div>
-                <div onclick="toggleTask(this)" data-task="tilawah" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all text-emerald-400">
-                    <span class="font-bold uppercase text-[12px]">Tilawah 1 Juz</span>
-                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
-                </div>
+            </div>
+
+            <div class="pt-2 space-y-3">
+                <div onclick="toggleTask(this)" data-task="tilawah" class="task-card bg-slate-900 p-5 rounded-2xl flex justify-between items-center cursor-pointer border border-slate-800 shadow-lg font-bold text-slate-200">Tilawah Qur'an <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
+                <div onclick="toggleTask(this)" data-task="baca_buku" class="task-card bg-slate-900 p-5 rounded-2xl flex justify-between items-center cursor-pointer border border-slate-800 shadow-lg font-bold text-slate-200">Baca Buku <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
+                <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-2xl flex justify-between items-center cursor-pointer border border-slate-800 shadow-lg font-bold text-emerald-400">Sedekah Subuh <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
+                <div onclick="toggleTask(this)" data-task="riyadho" class="task-card bg-slate-900 p-5 rounded-2xl flex justify-between items-center cursor-pointer border border-slate-800 shadow-lg font-bold text-blue-400">Riyadho <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
             </div>
         </div>
 
-        <button onclick="saveCurrentDay()" class="w-full mt-10 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black py-5 rounded-3xl shadow-xl shadow-emerald-900/40 active:scale-95 transition uppercase tracking-widest italic">
-            Simpan Progres Hari Ini
-        </button>
+        <button onclick="saveCurrentDay()" class="w-full mt-10 bg-gradient-to-br from-emerald-600 to-teal-800 text-white font-black py-5 rounded-3xl shadow-2xl active:scale-95 transition uppercase tracking-widest italic">Simpan Progres</button>
+    </div>
+
+    <div id="calendarModal" class="fixed inset-0 bg-slate-950/95 z-50 p-6 flex flex-col justify-center items-center">
+        <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 w-full max-w-xs shadow-2xl">
+            <h2 class="text-center font-black mb-6 italic text-emerald-400">PILIH TANGGAL</h2>
+            <input type="date" id="calendarInput" class="w-full bg-slate-800 p-4 rounded-xl border-none outline-none text-white font-bold mb-6">
+            <div class="flex space-x-3">
+                <button onclick="closeCalendar()" class="flex-grow bg-slate-700 py-3 rounded-xl font-bold">Batal</button>
+                <button onclick="applyDate()" class="flex-grow bg-emerald-500 py-3 rounded-xl font-bold text-slate-900">Pilih</button>
+            </div>
+        </div>
     </div>
 
     <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-50 p-6 flex flex-col">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-xl font-black uppercase tracking-tighter italic">Total Progres Grup</h2>
-            <button onclick="closeChart()" class="bg-red-500 text-white w-10 h-10 rounded-2xl font-bold">X</button>
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-xl font-black italic">RINGKASAN GRUP</h2>
+            <button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-2xl font-bold">X</button>
         </div>
-        <div class="bg-slate-900 p-4 rounded-3xl border border-slate-800 flex-grow flex items-center">
-            <canvas id="progressChart"></canvas>
-        </div>
-        <p class="text-center text-slate-500 text-[10px] mt-6 tracking-widest uppercase italic font-bold">Data berdasarkan akumulasi seluruh hari</p>
+        <div class="bg-slate-900 p-4 rounded-3xl border border-slate-800 flex-grow flex items-center shadow-inner"><canvas id="progressChart"></canvas></div>
     </div>
 
     <script>
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
-        const days = ["AHAD", "SENIN", "SELASA", "RABU", "KAMIS", "JUMAT", "SABTU"];
-        const startDate = new Date('2026-03-01'); // Kamu bisa ubah tgl awal ramadan di sini
+        let db = JSON.parse(localStorage.getItem('ramadan_pro_db')) || {};
+        let selectedDate = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
 
-        let activeDayIdx = 0; // Default hari pertama
-        let db = JSON.parse(localStorage.getItem('ramadan_tracker_v3')) || {};
-
-        // Inisialisasi Navigasi Hari
-        function initDayNav() {
-            const nav = document.getElementById('dayNavigation');
-            days.forEach((day, idx) => {
-                const date = new Date(startDate);
-                date.setDate(startDate.getDate() + idx);
-                const tglStr = date.getDate() + '/' + (date.getMonth() + 1);
-                
-                const btn = document.createElement('button');
-                btn.className = `day-btn flex-shrink-0 bg-slate-900 border border-slate-800 px-5 py-3 rounded-2xl text-center transition-all ${idx === activeDayIdx ? 'active' : ''}`;
-                btn.innerHTML = `<div class="text-[10px] opacity-60 font-bold">${day}</div><div class="text-sm font-black">${tglStr}</div>`;
-                btn.onclick = () => switchDay(idx);
-                nav.appendChild(btn);
-            });
-            updateDisplayDate();
+        function toggleFolder(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            content.classList.toggle('open');
+            icon.innerText = content.classList.contains('open') ? '▲' : '▼';
         }
 
-        function switchDay(idx) {
-            activeDayIdx = idx;
-            document.querySelectorAll('.day-btn').forEach((btn, i) => {
-                btn.classList.toggle('active', i === idx);
-            });
-            updateDisplayDate();
-            loadDayData();
-        }
+        function openCalendar() { document.getElementById('calendarModal').style.display = 'flex'; document.getElementById('calendarInput').value = selectedDate; }
+        function closeCalendar() { document.getElementById('calendarModal').style.display = 'none'; }
+        function applyDate() { selectedDate = document.getElementById('calendarInput').value; updateDisplayDate(); loadDayData(); closeCalendar(); }
 
         function updateDisplayDate() {
-            const date = new Date(startDate);
-            date.setDate(startDate.getDate() + activeDayIdx);
-            const options = { weekday: 'long', day: 'numeric', month: 'long' };
-            document.getElementById('currentDateDisplay').innerText = date.toLocaleDateString('id-ID', options);
+            const dateObj = new Date(selectedDate);
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById('currentDateDisplay').innerText = dateObj.toLocaleDateString('id-ID', options);
         }
 
-        function toggleTask(el) {
-            el.classList.toggle('active');
-            const box = el.querySelector('.box');
-            box.innerHTML = el.classList.contains('active') ? '✔' : '';
-        }
+        function toggleTask(el) { el.classList.toggle('active'); el.querySelector('.box').innerHTML = el.classList.contains('active') ? '✔' : ''; }
 
         function saveCurrentDay() {
             const user = document.getElementById('userSelect').value;
             const tasks = [];
-            document.querySelectorAll('.task-card.active').forEach(card => {
-                tasks.push(card.dataset.task);
-            });
+            document.querySelectorAll('.task-card.active').forEach(card => tasks.push(card.dataset.task));
 
-            // Simpan ke DB: db[Arif][hari_0] = [shubuh, dzuhur]
             if(!db[user]) db[user] = {};
-            db[user][`day_${activeDayIdx}`] = tasks;
+            db[user][selectedDate] = tasks; // Gunakan kunci tanggal asli (2026-03-01 dsb)
 
-            localStorage.setItem('ramadan_tracker_v3', JSON.stringify(db));
-            alert('Progres ' + user + ' untuk hari ini berhasil disimpan!');
+            localStorage.setItem('ramadan_pro_db', JSON.stringify(db));
+            alert('Progres ' + user + ' Berhasil Disimpan!');
         }
 
         function loadDayData() {
             const user = document.getElementById('userSelect').value;
-            const savedTasks = (db[user] && db[user][`day_${activeDayIdx}`]) ? db[user][`day_${activeDayIdx}`] : [];
-
+            const savedTasks = (db[user] && db[user][selectedDate]) ? db[user][selectedDate] : [];
             document.querySelectorAll('.task-card').forEach(card => {
-                const taskName = card.dataset.task;
-                if(savedTasks.includes(taskName)) {
-                    card.classList.add('active');
-                    card.querySelector('.box').innerHTML = '✔';
-                } else {
-                    card.classList.remove('active');
-                    card.querySelector('.box').innerHTML = '';
-                }
+                const isSelected = savedTasks.includes(card.dataset.task);
+                card.classList.toggle('active', isSelected);
+                card.querySelector('.box').innerHTML = isSelected ? '✔' : '';
             });
         }
 
         function openChart() {
             document.getElementById('chartModal').style.display = 'flex';
             const ctx = document.getElementById('progressChart').getContext('2d');
-            
-            // Hitung total progres semua hari untuk grafik
             const totalData = names.map(name => {
                 if(!db[name]) return 0;
                 let sum = 0;
-                Object.values(db[name]).forEach(dayTasks => sum += dayTasks.length);
+                Object.values(db[name]).forEach(t => sum += t.length);
                 return sum;
             });
-
             if(window.myChart) window.myChart.destroy();
             window.myChart = new Chart(ctx, {
                 type: 'bar',
-                data: {
-                    labels: names,
-                    datasets: [{
-                        label: 'Total Poin Amalan',
-                        data: totalData,
-                        backgroundColor: '#10b981',
-                        borderRadius: 10
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    scales: {
-                        x: { beginAtZero: true, grid: { color: '#1e293b' } },
-                        y: { ticks: { color: 'white' }, grid: { display: false } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
+                data: { labels: names, datasets: [{ label: 'Total Amalan', data: totalData, backgroundColor: '#10b981', borderRadius: 10 }] },
+                options: { indexAxis: 'y', responsive: true, scales: { x: { beginAtZero: true }, y: { ticks: { color: 'white' } } }, plugins: { legend: { display: false } } }
             });
         }
 
-        function closeChart() {
-            document.getElementById('chartModal').style.display = 'none';
-        }
+        function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
-        // Jalankan saat start
-        window.onload = () => {
-            initDayNav();
-            loadDayData();
-        };
+        // Saat Start: Ambil tanggal hari ini
+        window.onload = () => { updateDisplayDate(); loadDayData(); };
     </script>
 </body>
 </html>
