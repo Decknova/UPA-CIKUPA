@@ -3,33 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Group</title>
+    <title>Ramadan Tracker Group v3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
-        .task-card.active { background-color: #059669; border-color: #10b981; transform: scale(0.98); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         #chartModal { display: none; }
+        .day-btn.active { background-color: #10b981; color: #020617; transform: scale(1.1); font-weight: 800; }
+        .task-card.active { border-color: #10b981; background-color: #064e3b; }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen pb-10">
+<body class="text-slate-100 min-h-screen pb-20">
 
     <div class="max-w-md mx-auto px-5">
         <header class="flex justify-between items-center py-8">
             <div>
-                <h1 class="text-2xl font-extrabold text-emerald-400 italic">RAMADAN<span class="text-white">TRACKER</span></h1>
-                <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Ibadah Crew</p>
+                <h1 class="text-2xl font-extrabold text-emerald-400 italic uppercase">Ramadan<span class="text-white">Tracker</span></h1>
+                <p id="currentDateDisplay" class="text-slate-500 text-[10px] font-bold tracking-widest uppercase">Ahad, 1 Ramadan</p>
             </div>
-            <button onclick="openChart()" class="bg-slate-800 p-3 rounded-2xl shadow-lg border border-slate-700 active:scale-90 transition">
+            <button onclick="openChart()" class="bg-slate-900 p-3 rounded-2xl shadow-lg border border-slate-800 active:scale-90 transition">
                 📊 <span class="text-xs ml-1 font-bold">GRAFIK</span>
             </button>
         </header>
 
-        <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-8">
-            <label class="block mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500">Pilih Nama Kamu</label>
-            <select id="userSelect" onchange="switchUser()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 appearance-none shadow-inner">
+        <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-6">
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Anggota Kelompok</label>
+            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 appearance-none shadow-inner">
                 <option value="Arif">Arif</option>
                 <option value="Heru">Heru</option>
                 <option value="Fajar">Fajar</option>
@@ -40,134 +41,168 @@
             </select>
         </div>
 
-        <div class="flex space-x-3 overflow-x-auto mb-8 no-scrollbar">
-            <button class="flex-shrink-0 bg-emerald-600 px-6 py-2 rounded-xl text-xs font-bold shadow-lg shadow-emerald-500/20">AHAD</button>
-            <button class="flex-shrink-0 bg-slate-900 border border-slate-800 px-6 py-2 rounded-xl text-xs font-bold opacity-50">SENIN</button>
-            <button class="flex-shrink-0 bg-slate-900 border border-slate-800 px-6 py-2 rounded-xl text-xs font-bold opacity-50">SELASA</button>
+        <div id="dayNavigation" class="flex space-x-3 overflow-x-auto mb-8 pb-4 no-scrollbar">
             </div>
 
         <div id="taskSection" class="space-y-6">
-            <div>
-                <h3 class="text-emerald-400 text-xs font-black mb-4 tracking-tighter uppercase border-l-4 border-emerald-500 pl-3">Sholat Berjamaah</h3>
-                <div class="grid grid-cols-1 gap-3">
-                    <div onclick="toggleTask(this)" data-task="shubuh" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
-                        <span class="font-bold text-slate-300">Jamaah Shubuh</span>
-                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
-                    </div>
-                    <div onclick="toggleTask(this)" data-task="dzuhur" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
-                        <span class="font-bold text-slate-300">Jamaah Dzuhur</span>
-                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
-                    </div>
-                    <div onclick="toggleTask(this)" data-task="ashar" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
-                        <span class="font-bold text-slate-300">Jamaah Ashar</span>
-                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
-                    </div>
-                    <div onclick="toggleTask(this)" data-task="maghrib" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
-                        <span class="font-bold text-slate-300">Jamaah Maghrib</span>
-                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
-                    </div>
-                    <div onclick="toggleTask(this)" data-task="isya" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
-                        <span class="font-bold text-slate-300">Jamaah Isya</span>
-                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
-                    </div>
+            <h3 class="text-xs font-black mb-4 tracking-widest uppercase border-l-4 border-emerald-500 pl-3 text-emerald-400">Daftar Amalan Harian</h3>
+            
+            <div id="taskList" class="grid grid-cols-1 gap-3">
+                <div onclick="toggleTask(this)" data-task="shubuh" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all">
+                    <span class="font-bold text-slate-300">Jamaah & Rawatib Shubuh</span>
+                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
                 </div>
-            </div>
-
-            <div>
-                <h3 class="text-yellow-500 text-xs font-black mb-4 tracking-tighter uppercase border-l-4 border-yellow-500 pl-3">Ibadah Sunnah</h3>
-                <div class="grid grid-cols-1 gap-3">
-                    <div onclick="toggleTask(this)" data-task="tilawah" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
-                        <span class="font-bold text-slate-300">Tilawah Quran</span>
-                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
-                    </div>
-                    <div onclick="toggleTask(this)" data-task="dhuha" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all duration-200">
-                        <span class="font-bold text-slate-300">Sholat Dhuha</span>
-                        <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-[10px]"></div>
-                    </div>
+                <div onclick="toggleTask(this)" data-task="dzuhur" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all">
+                    <span class="font-bold text-slate-300">Jamaah & Rawatib Dzuhur</span>
+                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
+                </div>
+                <div onclick="toggleTask(this)" data-task="ashar" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all">
+                    <span class="font-bold text-slate-300">Jamaah Ashar</span>
+                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
+                </div>
+                <div onclick="toggleTask(this)" data-task="maghrib" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all">
+                    <span class="font-bold text-slate-300">Jamaah & Rawatib Maghrib</span>
+                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
+                </div>
+                <div onclick="toggleTask(this)" data-task="isya" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all">
+                    <span class="font-bold text-slate-300">Jamaah & Rawatib Isya</span>
+                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
+                </div>
+                <div onclick="toggleTask(this)" data-task="dhuha" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all text-yellow-500">
+                    <span class="font-bold uppercase text-[12px]">Sholat Dhuha</span>
+                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
+                </div>
+                <div onclick="toggleTask(this)" data-task="tilawah" class="task-card bg-slate-900 border border-slate-800 p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all text-emerald-400">
+                    <span class="font-bold uppercase text-[12px]">Tilawah 1 Juz</span>
+                    <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-xs"></div>
                 </div>
             </div>
         </div>
 
-        <button onclick="saveProgres()" class="w-full mt-10 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black py-5 rounded-3xl shadow-xl shadow-emerald-900/40 active:scale-95 transition uppercase tracking-widest italic">
-            Simpan Target Hari Ini
+        <button onclick="saveCurrentDay()" class="w-full mt-10 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black py-5 rounded-3xl shadow-xl shadow-emerald-900/40 active:scale-95 transition uppercase tracking-widest italic">
+            Simpan Progres Hari Ini
         </button>
     </div>
 
-    <div id="chartModal" class="fixed inset-0 bg-slate-950/95 z-50 p-6 flex flex-col">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="text-xl font-black">PROGRES GRUP</h2>
-            <button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-full font-bold">X</button>
+    <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-50 p-6 flex flex-col">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-black uppercase tracking-tighter italic">Total Progres Grup</h2>
+            <button onclick="closeChart()" class="bg-red-500 text-white w-10 h-10 rounded-2xl font-bold">X</button>
         </div>
         <div class="bg-slate-900 p-4 rounded-3xl border border-slate-800 flex-grow flex items-center">
             <canvas id="progressChart"></canvas>
         </div>
-        <p class="text-center text-slate-500 text-[10px] mt-6 tracking-widest uppercase italic">Update Real-Time Member</p>
+        <p class="text-center text-slate-500 text-[10px] mt-6 tracking-widest uppercase italic font-bold">Data berdasarkan akumulasi seluruh hari</p>
     </div>
 
     <script>
-        // Data Member
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
-        let db = JSON.parse(localStorage.getItem('ramadan_crew')) || {
-            "Arif": 0, "Heru": 0, "Fajar": 0, "Faisal": 0, "Mulyadi": 0, "Yudi": 0, "Kang Deny": 0
-        };
+        const days = ["AHAD", "SENIN", "SELASA", "RABU", "KAMIS", "JUMAT", "SABTU"];
+        const startDate = new Date('2026-03-01'); // Kamu bisa ubah tgl awal ramadan di sini
 
-        let currentChart;
+        let activeDayIdx = 0; // Default hari pertama
+        let db = JSON.parse(localStorage.getItem('ramadan_tracker_v3')) || {};
+
+        // Inisialisasi Navigasi Hari
+        function initDayNav() {
+            const nav = document.getElementById('dayNavigation');
+            days.forEach((day, idx) => {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + idx);
+                const tglStr = date.getDate() + '/' + (date.getMonth() + 1);
+                
+                const btn = document.createElement('button');
+                btn.className = `day-btn flex-shrink-0 bg-slate-900 border border-slate-800 px-5 py-3 rounded-2xl text-center transition-all ${idx === activeDayIdx ? 'active' : ''}`;
+                btn.innerHTML = `<div class="text-[10px] opacity-60 font-bold">${day}</div><div class="text-sm font-black">${tglStr}</div>`;
+                btn.onclick = () => switchDay(idx);
+                nav.appendChild(btn);
+            });
+            updateDisplayDate();
+        }
+
+        function switchDay(idx) {
+            activeDayIdx = idx;
+            document.querySelectorAll('.day-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === idx);
+            });
+            updateDisplayDate();
+            loadDayData();
+        }
+
+        function updateDisplayDate() {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + activeDayIdx);
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            document.getElementById('currentDateDisplay').innerText = date.toLocaleDateString('id-ID', options);
+        }
 
         function toggleTask(el) {
             el.classList.toggle('active');
             const box = el.querySelector('.box');
-            if(el.classList.contains('active')) {
-                box.innerHTML = '✔';
-                box.classList.add('bg-emerald-500', 'border-emerald-500');
-            } else {
-                box.innerHTML = '';
-                box.classList.remove('bg-emerald-500', 'border-emerald-500');
-            }
+            box.innerHTML = el.classList.contains('active') ? '✔' : '';
         }
 
-        function switchUser() {
-            // Reset centang di layar setiap ganti user agar tidak membingungkan
-            document.querySelectorAll('.task-card').forEach(c => {
-                c.classList.remove('active');
-                const box = c.querySelector('.box');
-                box.innerHTML = '';
-                box.classList.remove('bg-emerald-500', 'border-emerald-500');
+        function saveCurrentDay() {
+            const user = document.getElementById('userSelect').value;
+            const tasks = [];
+            document.querySelectorAll('.task-card.active').forEach(card => {
+                tasks.push(card.dataset.task);
             });
+
+            // Simpan ke DB: db[Arif][hari_0] = [shubuh, dzuhur]
+            if(!db[user]) db[user] = {};
+            db[user][`day_${activeDayIdx}`] = tasks;
+
+            localStorage.setItem('ramadan_tracker_v3', JSON.stringify(db));
+            alert('Progres ' + user + ' untuk hari ini berhasil disimpan!');
         }
 
-        function saveProgres() {
-            const currentUser = document.getElementById('userSelect').value;
-            const count = document.querySelectorAll('.active').length;
-            
-            db[currentUser] = count;
-            localStorage.setItem('ramadan_crew', JSON.stringify(db));
-            
-            alert(`Masyallah, ${currentUser}! Progres kamu: ${count} tugas tersimpan.`);
+        function loadDayData() {
+            const user = document.getElementById('userSelect').value;
+            const savedTasks = (db[user] && db[user][`day_${activeDayIdx}`]) ? db[user][`day_${activeDayIdx}`] : [];
+
+            document.querySelectorAll('.task-card').forEach(card => {
+                const taskName = card.dataset.task;
+                if(savedTasks.includes(taskName)) {
+                    card.classList.add('active');
+                    card.querySelector('.box').innerHTML = '✔';
+                } else {
+                    card.classList.remove('active');
+                    card.querySelector('.box').innerHTML = '';
+                }
+            });
         }
 
         function openChart() {
             document.getElementById('chartModal').style.display = 'flex';
             const ctx = document.getElementById('progressChart').getContext('2d');
             
-            if(currentChart) currentChart.destroy();
+            // Hitung total progres semua hari untuk grafik
+            const totalData = names.map(name => {
+                if(!db[name]) return 0;
+                let sum = 0;
+                Object.values(db[name]).forEach(dayTasks => sum += dayTasks.length);
+                return sum;
+            });
 
-            currentChart = new Chart(ctx, {
+            if(window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: names,
                     datasets: [{
-                        label: 'Tugas Selesai',
-                        data: names.map(n => db[n]),
+                        label: 'Total Poin Amalan',
+                        data: totalData,
                         backgroundColor: '#10b981',
-                        borderRadius: 12,
-                        barThickness: 25
+                        borderRadius: 10
                     }]
                 },
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     scales: {
-                        y: { beginAtZero: true, max: 7, grid: { color: '#1e293b' } },
-                        x: { grid: { display: false } }
+                        x: { beginAtZero: true, grid: { color: '#1e293b' } },
+                        y: { ticks: { color: 'white' }, grid: { display: false } }
                     },
                     plugins: { legend: { display: false } }
                 }
@@ -177,6 +212,12 @@
         function closeChart() {
             document.getElementById('chartModal').style.display = 'none';
         }
+
+        // Jalankan saat start
+        window.onload = () => {
+            initDayNav();
+            loadDayData();
+        };
     </script>
 </body>
 </html>
