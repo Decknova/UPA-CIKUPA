@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro v17 - Admin Mode</title>
+    <title>Ramadan Tracker Pro v19 - Full Features</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -15,7 +15,7 @@
         .task-card.active { border-color: #10b981; background-color: rgba(6, 78, 59, 0.5); }
         .folder-content { display: none; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
         .folder-content.open { display: block; opacity: 1; transform: translateY(0); }
-        #sidebar, #chartModal, #loginOverlay { display: none; }
+        #sidebar, #chartModal, #loginOverlay, #passManagerModal { display: none; }
         .sidebar-open { display: block !important; animation: slideIn 0.3s forwards; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .page-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
@@ -32,7 +32,7 @@
                 <p id="currentDateDisplay" class="text-slate-400 text-[10px] font-bold tracking-widest uppercase mt-1 italic"></p>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="openChart()" class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-lg hover:bg-slate-800">📊</button>
+                <button onclick="openChart()" class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-lg">📊</button>
                 <button onclick="toggleSidebar()" class="bg-emerald-500 text-slate-950 p-2.5 rounded-xl shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
@@ -47,17 +47,17 @@
                     <p class="font-bold text-white" id="activeUserName">Belum Login</p>
                 </div>
             </div>
-            <button onclick="showLogin()" class="text-[10px] font-black uppercase text-emerald-500 border border-emerald-500/30 px-4 py-2 rounded-xl hover:bg-emerald-500 hover:text-slate-950 transition">Ganti User</button>
+            <button onclick="showLogin()" class="text-[10px] font-black uppercase text-emerald-500 border border-emerald-500/30 px-4 py-2 rounded-xl">Ganti User</button>
         </div>
 
-        <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-4">
-            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500 text-center">Pilih Tanggal</label>
+        <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-4 text-center">
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Pilih Tanggal</label>
             <input type="date" id="datePicker" onchange="changeDate(this.value)" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl text-lg font-bold outline-none text-white">
         </div>
 
         <div id="adminUserSelector" class="bg-slate-900/50 border border-amber-500/30 p-5 rounded-3xl mb-4 hidden">
-            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-amber-500 text-center">Admin: Edit Progres Member</label>
-            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl text-lg font-bold outline-none text-white appearance-none cursor-pointer">
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-amber-500 text-center">Admin: Edit Member</label>
+            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl text-lg font-bold outline-none text-white">
                 <option value="Arif">Arif</option><option value="Heru">Heru</option><option value="Fajar">Fajar</option><option value="Faisal">Faisal</option><option value="Mulyadi">Mulyadi</option><option value="Yudi">Yudi</option><option value="Kang Deny">Kang Deny</option>
             </select>
         </div>
@@ -69,11 +69,25 @@
                     <span id="icon-folderSholat" class="text-xs text-slate-500">▼</span>
                 </button>
                 <div id="folderSholat" class="folder-content px-4 pb-4 space-y-2">
-                    <div onclick="toggleTask(this)" data-task="Jamaah Shubuh" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="Jamaah Dzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="Jamaah Ashar" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Ashar</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="Jamaah Maghrib" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="Jamaah Isya" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Jamaah Shubuh" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Jamaah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Jamaah Dzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Jamaah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Jamaah Ashar" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Jamaah Ashar</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Jamaah Maghrib" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Jamaah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Jamaah Isya" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Jamaah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+                <button onclick="toggleFolder('folderRawatib')" class="w-full p-5 flex justify-between items-center hover:bg-slate-800/50 transition">
+                    <span class="font-black text-[10px] tracking-widest text-teal-400 uppercase italic">Sholat Rawatib</span>
+                    <span id="icon-folderRawatib" class="text-xs text-slate-500">▼</span>
+                </button>
+                <div id="folderRawatib" class="folder-content px-4 pb-4 space-y-2">
+                    <div onclick="toggleTask(this)" data-task="Qobliyah Shubuh" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Qobliyah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Qobliyah Dzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Qobliyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Ba'diyah Dzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Ba'diyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Ba'diyah Maghrib" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Ba'diyah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Ba'diyah Isya" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Ba'diyah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
                 </div>
             </div>
 
@@ -87,32 +101,59 @@
                 </div>
             </div>
 
+            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+                <button onclick="toggleFolder('folderSunnah')" class="w-full p-5 flex justify-between items-center hover:bg-slate-800/50 transition">
+                    <span class="font-black text-[10px] tracking-widest text-yellow-500 uppercase italic">Sholat Sunnah</span>
+                    <span id="icon-folderSunnah" class="text-xs text-slate-500">▼</span>
+                </button>
+                <div id="folderSunnah" class="folder-content px-4 pb-4 space-y-2">
+                    <div onclick="toggleTask(this)" data-task="Dhuha" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Dhuha</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Tahajud" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Tahajud</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Witir" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic text-sm"><span>Witir</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                </div>
+            </div>
+
             <div onclick="toggleTask(this)" data-task="Sedekah Subuh" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400"><span>Sedekah Subuh</span><div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
             <div onclick="toggleTask(this)" data-task="Riyadho" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-rose-400"><span>Riyadho</span><div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
 
-            <button id="saveBtn" onclick="saveCurrentDay()" class="w-full mt-10 bg-emerald-600 text-white font-black py-5 rounded-3xl shadow-2xl uppercase tracking-widest italic hidden">Simpan Progress</button>
+            <button id="saveBtn" onclick="saveCurrentDay()" class="w-full mt-10 bg-emerald-600 text-white font-black py-5 rounded-3xl shadow-2xl uppercase italic hidden">Simpan Progress</button>
         </div>
     </div>
 
     <div id="loginOverlay" class="fixed inset-0 bg-slate-950/95 z-[200] flex items-center justify-center p-6 backdrop-blur-sm">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-xs rounded-[40px] p-8 shadow-2xl">
-            <h2 class="text-center font-black italic text-emerald-400 text-xl mb-6 uppercase">Pintu Masuk</h2>
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-xs rounded-[40px] p-8 text-center">
+            <h2 class="font-black italic text-emerald-400 text-xl mb-6">LOGIN</h2>
             <div class="space-y-4">
-                <select id="loginUser" class="w-full bg-slate-800 p-4 rounded-2xl font-bold outline-none text-white border border-slate-700">
-                    <option value="Admin">--- LOGIN ADMIN ---</option>
+                <select id="loginUser" class="w-full bg-slate-800 p-4 rounded-2xl font-bold text-white border border-slate-700">
+                    <option value="Admin">--- ADMIN ---</option>
                     <option value="Arif">Arif</option><option value="Heru">Heru</option><option value="Fajar">Fajar</option><option value="Faisal">Faisal</option><option value="Mulyadi">Mulyadi</option><option value="Yudi">Yudi</option><option value="Kang Deny">Kang Deny</option>
                 </select>
-                <input type="password" id="loginPass" placeholder="Password" class="w-full bg-slate-800 p-4 rounded-2xl font-bold outline-none text-white border border-slate-700 text-center">
-                <button onclick="processLogin()" class="w-full bg-emerald-500 text-slate-950 font-black py-4 rounded-2xl shadow-lg active:scale-95">MASUK</button>
-                <button onclick="hideLogin()" class="w-full text-slate-500 font-bold text-xs">BATAL</button>
+                <input type="password" id="loginPass" placeholder="Password" class="w-full bg-slate-800 p-4 rounded-2xl font-bold text-white border border-slate-700 text-center">
+                <button onclick="processLogin()" class="w-full bg-emerald-500 text-slate-950 font-black py-4 rounded-2xl">MASUK</button>
+                <button onclick="hideLogin()" class="text-slate-500 font-bold text-xs mt-4">BATAL</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="passManagerModal" class="fixed inset-0 bg-slate-950/95 z-[250] flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-amber-500/30 w-full max-w-xs rounded-[40px] p-8 text-center">
+            <h2 class="font-black italic text-amber-500 text-lg mb-6 uppercase">Ganti Pass Member</h2>
+            <div class="space-y-4">
+                <select id="passTargetUser" class="w-full bg-slate-800 p-4 rounded-2xl font-bold text-white border border-slate-700">
+                    <option value="Arif">Arif</option><option value="Heru">Heru</option><option value="Fajar">Fajar</option><option value="Faisal">Faisal</option><option value="Mulyadi">Mulyadi</option><option value="Yudi">Yudi</option><option value="Kang Deny">Kang Deny</option>
+                </select>
+                <input type="text" id="newPassValue" placeholder="Pass Baru" class="w-full bg-slate-800 p-4 rounded-2xl font-bold text-white border border-slate-700 text-center">
+                <button onclick="updateMemberPassword()" class="w-full bg-amber-500 text-slate-950 font-black py-4 rounded-2xl">UPDATE</button>
+                <button onclick="closePassManager()" class="text-slate-500 font-bold text-xs mt-4">TUTUP</button>
             </div>
         </div>
     </div>
 
     <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[150] p-4 flex flex-col overflow-y-auto">
-        <div class="flex justify-between items-center mb-6 pt-4 px-2"><h2 class="text-xl font-black italic text-emerald-400 uppercase">Ranking Grup</h2><button onclick="closeChart()" class="text-red-500 font-black text-xl">✕</button></div>
-        <div class="bg-slate-900 p-4 rounded-3xl min-h-[250px] shadow-inner mb-6"><canvas id="progressChart"></canvas></div>
+        <div class="flex justify-between items-center mb-6 pt-4"><h2 class="text-xl font-black italic text-emerald-400">RANKING</h2><button onclick="closeChart()" class="text-red-500 font-black text-xl">✕</button></div>
+        <div class="bg-slate-900 p-4 rounded-3xl min-h-[250px] mb-6"><canvas id="progressChart"></canvas></div>
         <div id="rankTableContainer"></div>
+        <div id="adminActionArea" class="mt-6 flex flex-col items-center"></div>
     </div>
 
     <script>
@@ -128,8 +169,8 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        const userPasswords = {
-            "Admin": "admin123", // Password Admin
+        let userPasswords = JSON.parse(localStorage.getItem('ramadan_passwords')) || {
+            "Admin": "admin123",
             "Arif": "1234", "Heru": "1234", "Fajar": "1234", "Faisal": "1234", "Mulyadi": "1234", "Yudi": "1234", "Kang Deny": "1234"
         };
 
@@ -143,7 +184,6 @@
         }
         let selectedDate = getJakartaDate();
 
-        // Init Tilawah
         const grid = document.getElementById('pageGridContainer');
         for(let i=1; i<=20; i++) {
             const div = document.createElement('div');
@@ -158,28 +198,30 @@
             loadDayData();
         });
 
-        // Login System
         function showLogin() { document.getElementById('loginOverlay').style.display = 'flex'; }
         function hideLogin() { document.getElementById('loginOverlay').style.display = 'none'; }
+        function openPassManager() { document.getElementById('passManagerModal').style.display = 'flex'; }
+        function closePassManager() { document.getElementById('passManagerModal').style.display = 'none'; }
 
         function processLogin() {
             const user = document.getElementById('loginUser').value;
             const pass = document.getElementById('loginPass').value;
             if(userPasswords[user] === pass) {
-                if(user === "Admin") {
-                    isAdmin = true;
-                    currentUser = "Admin";
-                    localStorage.setItem('ramadan_is_admin', 'true');
-                } else {
-                    isAdmin = false;
-                    currentUser = user;
-                    localStorage.setItem('ramadan_is_admin', 'false');
-                }
+                isAdmin = (user === "Admin");
+                currentUser = user;
+                localStorage.setItem('ramadan_is_admin', isAdmin);
                 localStorage.setItem('ramadan_user', currentUser);
-                checkLoginStatus();
-                hideLogin();
-                loadDayData();
+                checkLoginStatus(); hideLogin(); loadDayData();
             } else { alert("Password Salah!"); }
+        }
+
+        function updateMemberPassword() {
+            const user = document.getElementById('passTargetUser').value;
+            const newPass = document.getElementById('newPassValue').value;
+            if(!newPass) return;
+            userPasswords[user] = newPass;
+            localStorage.setItem('ramadan_passwords', JSON.stringify(userPasswords));
+            alert("Pass " + user + " diganti!"); closePassManager();
         }
 
         function checkLoginStatus() {
@@ -187,23 +229,14 @@
             const statusLabel = document.getElementById('userRoleLabel');
             const nameLabel = document.getElementById('activeUserName');
             const initial = document.getElementById('userInitial');
-            const adminPanel = document.getElementById('adminUserSelector');
-
             if(isAdmin) {
-                statusLabel.innerText = "MODE ADMIN";
-                statusLabel.classList.add('text-amber-500');
-                nameLabel.innerText = "Admin Akses";
-                initial.innerText = "A";
-                initial.classList.replace('bg-emerald-500/20', 'bg-amber-500/20');
-                initial.classList.replace('text-emerald-500', 'text-amber-500');
-                adminPanel.classList.remove('hidden');
+                statusLabel.innerText = "MODE ADMIN"; nameLabel.innerText = "Admin";
+                initial.innerText = "A"; initial.className = "w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center text-amber-500 font-bold";
+                document.getElementById('adminUserSelector').classList.remove('hidden');
             } else {
-                statusLabel.innerText = "USER AKTIF";
-                statusLabel.classList.remove('text-amber-500');
-                nameLabel.innerText = currentUser;
-                initial.innerText = currentUser.charAt(0);
-                initial.classList.add('bg-emerald-500/20', 'text-emerald-500');
-                adminPanel.classList.add('hidden');
+                statusLabel.innerText = "USER AKTIF"; nameLabel.innerText = currentUser;
+                initial.innerText = currentUser.charAt(0); initial.className = "w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-500 font-bold";
+                document.getElementById('adminUserSelector').classList.add('hidden');
             }
             document.getElementById('trackerContent').style.opacity = "1";
             document.getElementById('trackerContent').style.pointerEvents = "auto";
@@ -211,21 +244,20 @@
         }
 
         function saveCurrentDay() {
-            const targetUser = isAdmin ? document.getElementById('userSelect').value : currentUser;
+            const target = isAdmin ? document.getElementById('userSelect').value : currentUser;
             const tasks = [];
             document.querySelectorAll('.task-card.active, .page-box.active').forEach(el => tasks.push(el.dataset.task));
-            database.ref('ramadan_db_v12/' + targetUser + '/' + selectedDate).set(tasks)
-            .then(() => alert(`Progres ${targetUser} berhasil diperbarui!`));
+            database.ref('ramadan_db_v12/' + target + '/' + selectedDate).set(tasks)
+            .then(() => alert("Tersimpan!"));
         }
 
         function loadDayData() {
-            const targetUser = isAdmin ? document.getElementById('userSelect').value : (currentUser || names[0]);
-            const savedTasks = (db[targetUser] && db[targetUser][selectedDate]) ? db[targetUser][selectedDate] : [];
+            const target = isAdmin ? document.getElementById('userSelect').value : (currentUser || names[0]);
+            const saved = (db[target] && db[target][selectedDate]) ? db[target][selectedDate] : [];
             document.querySelectorAll('.task-card, .page-box').forEach(el => {
-                const isSelected = savedTasks.includes(el.dataset.task);
-                el.classList.toggle('active', isSelected);
-                const box = el.querySelector('.box');
-                if(box) box.innerHTML = isSelected ? '✔' : '';
+                const sel = saved.includes(el.dataset.task);
+                el.classList.toggle('active', sel);
+                const b = el.querySelector('.box'); if(b) b.innerHTML = sel ? '✔' : '';
             });
         }
 
@@ -238,36 +270,35 @@
         function toggleTask(el) { if(currentUser) el.classList.toggle('active'); }
         function toggleFolder(id) { document.getElementById(id).classList.toggle('open'); }
 
-        // Chart
         function openChart() {
             document.getElementById('chartModal').style.display = 'flex';
             const ctx = document.getElementById('progressChart').getContext('2d');
-            let rankData = names.map(name => {
-                let total = 0;
-                if (db[name]) { Object.keys(db[name]).forEach(tgl => { total += db[name][tgl].length; }); }
-                return { name: name, score: total };
-            });
-            rankData.sort((a, b) => b.score - a.score);
+            let rd = names.map(n => {
+                let t = 0; if(db[n]) Object.keys(db[n]).forEach(k => t += db[n][k].length);
+                return { name: n, score: t };
+            }).sort((a,b) => b.score - a.score);
+
             if(window.myChart) window.myChart.destroy();
             window.myChart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: rankData.map(d=>d.name), datasets: [{ data: rankData.map(d=>d.score), backgroundColor: '#10b981', borderRadius: 10 }] },
+                data: { labels: rd.map(d=>d.name), datasets: [{ data: rd.map(d=>d.score), backgroundColor: '#10b981' }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
-            let tableHTML = `<div class="w-full bg-slate-900/50 rounded-2xl border border-slate-800 p-2"><table class="w-full text-left text-xs"><tbody class="divide-y divide-slate-800">`;
-            rankData.forEach((player, index) => {
-                let trophy = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : index + 1;
-                tableHTML += `<tr class="p-2"><td class="p-3 text-lg">${trophy}</td><td class="p-3 font-bold">${player.name}</td><td class="p-3 text-right font-black text-emerald-500">${player.score} pt</td></tr>`;
+
+            let h = `<div class="bg-slate-900/50 rounded-2xl p-2"><table class="w-full text-xs text-left"><tbody class="divide-y divide-slate-800">`;
+            rd.forEach((p, i) => {
+                let tr = (i===0)?"🥇":(i===1)?"🥈":(i===2)?"🥉":i+1;
+                h += `<tr><td class="p-3 text-lg">${tr}</td><td class="p-3 font-bold">${p.name}</td><td class="p-3 text-right font-black text-emerald-500">${p.score} pt</td></tr>`;
             });
-            tableHTML += `</tbody></table></div>`;
-            document.getElementById('rankTableContainer').innerHTML = tableHTML;
+            h += `</tbody></table></div>`;
+            document.getElementById('rankTableContainer').innerHTML = h;
+            if(isAdmin) document.getElementById('adminActionArea').innerHTML = `<button onclick="openPassManager()" class="mt-4 text-[10px] font-black text-amber-500 border border-amber-500/30 px-6 py-3 rounded-2xl">⚙️ KELOLA PASSWORD</button>`;
         }
 
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
         window.onload = () => {
             document.getElementById('datePicker').value = selectedDate;
-            changeDate(selectedDate);
-            checkLoginStatus();
+            changeDate(selectedDate); checkLoginStatus();
         };
     </script>
 </body>
