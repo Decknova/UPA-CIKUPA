@@ -3,23 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro v9</title>
+    <title>Ramadan Tracker Pro v9 - Fixed</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; overflow-x: hidden; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
         .task-card.active { border-color: #10b981; background-color: #064e3b; }
         .folder-content { display: none; }
         .folder-content.open { display: block; }
         #sidebar, #chartModal { display: none; }
         .sidebar-open { display: block !important; animation: slideIn 0.3s forwards; }
-        /* Styling khusus agar input date terlihat bagus di dark mode */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-        }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
@@ -44,25 +39,9 @@
             </div>
         </header>
 
-        <div id="sidebar" class="fixed inset-y-0 right-0 w-72 bg-slate-950 border-l border-slate-800 z-[70] p-6 shadow-2xl">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="font-black text-emerald-400 italic uppercase tracking-widest text-sm">Playlist Musik</h3>
-                <button onclick="toggleSidebar()" class="text-slate-500 font-bold">✕</button>
-            </div>
-            <div id="playlistContainer" class="space-y-2">
-                <button onclick="playTrack('music/asmaun-nabi.mp3', 'Asmaun Nabi')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold hover:bg-slate-800 transition italic">🎵 Asmaun Nabi</button>
-                <button onclick="playTrack('music/lagu-kesayangan-arif.mp3', 'Lagu Kesayangan Arif')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold hover:bg-slate-800 transition italic">🎵 Lagu Kesayangan Arif</button>
-            </div>
-            <div class="mt-8 p-4 bg-slate-900 rounded-2xl border border-slate-800 text-center">
-                <p id="trackTitle" class="text-[9px] font-black text-emerald-500 mb-3 uppercase tracking-widest">Pilih Lagu</p>
-                <button id="playBtn" onclick="toggleMusic()" class="bg-emerald-500 text-slate-950 w-12 h-12 rounded-full mx-auto flex items-center justify-center font-bold text-xl shadow-lg shadow-emerald-500/20">▶</button>
-                <audio id="bgMusic" loop></audio>
-            </div>
-        </div>
-
         <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-6 shadow-xl">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Anggota</label>
-            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 appearance-none">
+            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none appearance-none">
                 <option value="Arif">Arif</option>
                 <option value="Heru">Heru</option>
                 <option value="Fajar">Fajar</option>
@@ -93,6 +72,18 @@
                 </div>
             </div>
 
+            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg">
+                <button onclick="toggleFolder('folderSunnah')" class="w-full p-5 flex justify-between items-center bg-slate-900">
+                    <span class="font-black text-[10px] tracking-widest text-yellow-500 uppercase italic">Sholat Sunnah Nawafil</span>
+                    <span id="icon-folderSunnah" class="text-xs">▼</span>
+                </button>
+                <div id="folderSunnah" class="folder-content p-4 space-y-2 bg-slate-950/50">
+                    <div onclick="toggleTask(this)" data-task="dhuha" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Dhuha</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="tahajud" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Tahajud</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="witir" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Witir</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                </div>
+            </div>
+
             <div class="space-y-3 pt-2">
                 <div onclick="toggleTask(this)" data-task="tilawah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic">Tilawah Qur'an <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
                 <div onclick="toggleTask(this)" data-task="buku" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic">Baca Buku <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
@@ -104,15 +95,30 @@
         <button onclick="saveCurrentDay()" class="w-full mt-10 bg-gradient-to-br from-emerald-600 to-teal-800 text-white font-black py-5 rounded-3xl shadow-xl active:scale-95 transition uppercase tracking-[0.2em] italic">Simpan Progress</button>
     </div>
 
+    <div id="sidebar" class="fixed inset-y-0 right-0 w-72 bg-slate-950 border-l border-slate-800 z-[70] p-6">
+         <div class="flex justify-between items-center mb-8">
+            <h3 class="font-black text-emerald-400 italic uppercase tracking-widest text-sm">Playlist Musik</h3>
+            <button onclick="toggleSidebar()" class="text-slate-500 font-bold">✕</button>
+        </div>
+        <div id="playlistContainer" class="space-y-2">
+            <button onclick="playTrack('music/asmaun-nabi.mp3', 'Asmaun Nabi')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold italic">🎵 Asmaun Nabi</button>
+            <button onclick="playTrack('music/lagu-kesayangan-arif.mp3', 'Lagu Kesayangan Arif')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold italic">🎵 Lagu Kesayangan Arif</button>
+        </div>
+        <div class="mt-8 p-4 bg-slate-900 rounded-2xl border border-slate-800 text-center">
+            <p id="trackTitle" class="text-[9px] font-black text-emerald-500 mb-3 uppercase tracking-widest">Pilih Lagu</p>
+            <button id="playBtn" onclick="toggleMusic()" class="bg-emerald-500 text-slate-950 w-12 h-12 rounded-full mx-auto flex items-center justify-center font-bold text-xl shadow-lg">▶</button>
+            <audio id="bgMusic" loop></audio>
+        </div>
+    </div>
+
     <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[80] p-4 flex flex-col">
         <div class="flex justify-between items-center mb-6 pt-4 px-2">
-            <h2 class="text-xl font-black italic tracking-tighter text-emerald-400 uppercase">PROGRES GRUP</h2>
-            <button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-2xl font-bold border border-red-500/20">X</button>
+            <h2 class="text-xl font-black italic text-emerald-400 uppercase">PROGRES GRUP</h2>
+            <button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-2xl font-bold">X</button>
         </div>
         <div class="bg-slate-900 p-4 rounded-3xl flex-grow flex items-center shadow-inner overflow-hidden">
             <canvas id="progressChart"></canvas>
         </div>
-        <p class="text-center text-slate-500 text-[9px] font-bold mt-4 tracking-widest uppercase italic">Akumulasi Amalan Per Tanggal</p>
     </div>
 
     <script>
@@ -121,42 +127,20 @@
         
         let db = JSON.parse(localStorage.getItem('ramadan_db_v9')) || {};
 
-        // 1. KUNCI WAKTU JAKARTA
         function getJakartaDate() {
             return new Intl.DateTimeFormat('en-CA', { 
-                timeZone: 'Asia/Jakarta', 
-                year: 'numeric', 
-                month: '2-digit', 
-                day: '2-digit' 
+                timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' 
             }).format(new Date());
         }
 
         let selectedDate = getJakartaDate();
 
-        // 2. FUNGSI GANTI TANGGAL KALENDER
         function changeDate(newDate) {
             selectedDate = newDate;
             loadDayData();
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-open'); }
-        
-        function playTrack(url, title) {
-            const audio = document.getElementById('bgMusic');
-            audio.src = url;
-            document.getElementById('trackTitle').innerText = title;
-            audio.play();
-            document.getElementById('playBtn').innerText = '⏸';
-        }
-
-        function toggleMusic() {
-            const audio = document.getElementById('bgMusic');
-            if (audio.src) {
-                if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
-                else { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
-            }
-        }
-
         function toggleFolder(id) {
             const content = document.getElementById(id);
             const icon = document.getElementById('icon-' + id);
@@ -176,7 +160,7 @@
             if(!db[user]) db[user] = {};
             db[user][selectedDate] = tasks;
             localStorage.setItem('ramadan_db_v9', JSON.stringify(db));
-            alert('Sukses! Progres ' + user + ' tgl ' + selectedDate + ' tersimpan.');
+            alert('Data ' + user + ' tgl ' + selectedDate + ' berhasil disimpan.');
         }
 
         function loadDayData() {
@@ -192,39 +176,27 @@
         function openChart() {
             document.getElementById('chartModal').style.display = 'flex';
             const ctx = document.getElementById('progressChart').getContext('2d');
-            const dataPoin = names.map(name => {
-                return (db[name] && db[name][selectedDate]) ? db[name][selectedDate].length : 0;
-            });
-
+            const dataPoin = names.map(name => (db[name] && db[name][selectedDate]) ? db[name][selectedDate].length : 0);
             if(window.myChart) window.myChart.destroy();
             window.myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: names,
-                    datasets: [{
-                        data: dataPoin,
-                        backgroundColor: chartColors,
-                        borderRadius: 12,
-                        barThickness: 30
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { beginAtZero: true, max: 20, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
-                        y: { grid: { display: false }, ticks: { color: 'white', font: { weight: 'bold', size: 12 } } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
+                type: 'bar', data: { labels: names, datasets: [{ data: dataPoin, backgroundColor: chartColors, borderRadius: 12 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, max: 20 }, y: { ticks: { color: 'white' } } }, plugins: { legend: { display: false } } }
             });
         }
 
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
+        function playTrack(url, title) { 
+            const audio = document.getElementById('bgMusic'); audio.src = url; 
+            document.getElementById('trackTitle').innerText = title; audio.play(); 
+            document.getElementById('playBtn').innerText = '⏸'; 
+        }
+        function toggleMusic() {
+            const audio = document.getElementById('bgMusic');
+            if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
+            else { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
+        }
 
         window.onload = () => {
-            // Set input kalender ke tanggal Jakarta saat ini
             document.getElementById('datePicker').value = selectedDate;
             loadDayData();
         };
