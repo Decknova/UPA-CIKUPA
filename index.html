@@ -15,17 +15,12 @@
             overflow-x: hidden; 
         }
 
-        /* Task Card Styling */
-        .task-card {
-            transition: all 0.2s ease;
-        }
-
+        .task-card { transition: all 0.2s ease; }
         .task-card.active { 
             border-color: #10b981; 
             background-color: rgba(6, 78, 59, 0.5); 
         }
 
-        /* Dropdown/Folder Logic */
         .folder-content { 
             display: none;
             opacity: 0;
@@ -40,7 +35,6 @@
         }
 
         #sidebar, #chartModal { display: none; }
-        
         .sidebar-open { 
             display: block !important; 
             animation: slideIn 0.3s forwards; 
@@ -49,6 +43,12 @@
         @keyframes slideIn {
             from { transform: translateX(100%); }
             to { transform: translateX(0); }
+        }
+
+        /* Styling khusus untuk input tanggal agar matching */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -72,20 +72,9 @@
             </div>
         </header>
 
-        <div id="sidebar" class="fixed inset-y-0 right-0 w-72 bg-slate-950 border-l border-slate-800 z-[100] p-6 shadow-2xl">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="font-black text-emerald-400 italic uppercase tracking-widest text-sm">Playlist</h3>
-                <button onclick="toggleSidebar()" class="text-slate-500 font-bold">✕</button>
-            </div>
-            <div class="space-y-2">
-                <button onclick="playTrack('music/asmaun-nabi.mp3', 'Asmaun Nabi')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold italic hover:border-emerald-500 transition">🎵 Asmaun Nabi</button>
-                <button onclick="playTrack('music/lagu-kesayangan-arif.mp3', 'Lagu Kesayangan Arif')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold italic hover:border-emerald-500 transition">🎵 Lagu Kesayangan Arif</button>
-            </div>
-            <div class="mt-8 p-4 bg-slate-900 rounded-2xl border border-slate-800 text-center">
-                <p id="trackTitle" class="text-[9px] font-black text-emerald-500 mb-3 uppercase tracking-widest">Pilih Lagu</p>
-                <button id="playBtn" onclick="toggleMusic()" class="bg-emerald-500 text-slate-950 w-12 h-12 rounded-full mx-auto flex items-center justify-center font-bold text-xl shadow-lg shadow-emerald-500/20">▶</button>
-                <audio id="bgMusic" loop></audio>
-            </div>
+        <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-4">
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Pilih Tanggal Progres</label>
+            <input type="date" id="datePicker" onchange="changeDate(this.value)" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 text-white cursor-pointer">
         </div>
 
         <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-6">
@@ -154,6 +143,22 @@
         </button>
     </div>
 
+    <div id="sidebar" class="fixed inset-y-0 right-0 w-72 bg-slate-950 border-l border-slate-800 z-[100] p-6 shadow-2xl">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="font-black text-emerald-400 italic uppercase tracking-widest text-sm">Playlist</h3>
+            <button onclick="toggleSidebar()" class="text-slate-500 font-bold">✕</button>
+        </div>
+        <div class="space-y-2">
+            <button onclick="playTrack('music/asmaun-nabi.mp3', 'Asmaun Nabi')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold italic hover:border-emerald-500 transition">🎵 Asmaun Nabi</button>
+            <button onclick="playTrack('music/lagu-kesayangan-arif.mp3', 'Lagu Kesayangan Arif')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold italic hover:border-emerald-500 transition">🎵 Lagu Kesayangan Arif</button>
+        </div>
+        <div class="mt-8 p-4 bg-slate-900 rounded-2xl border border-slate-800 text-center">
+            <p id="trackTitle" class="text-[9px] font-black text-emerald-500 mb-3 uppercase tracking-widest">Pilih Lagu</p>
+            <button id="playBtn" onclick="toggleMusic()" class="bg-emerald-500 text-slate-950 w-12 h-12 rounded-full mx-auto flex items-center justify-center font-bold text-xl shadow-lg shadow-emerald-500/20">▶</button>
+            <audio id="bgMusic" loop></audio>
+        </div>
+    </div>
+
     <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[150] p-4 flex flex-col">
         <div class="flex justify-between items-center mb-6 pt-4 px-2">
             <h2 class="text-xl font-black italic tracking-tighter text-emerald-400">PROGRES GRUP</h2>
@@ -168,12 +173,19 @@
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
         const chartColors = ['#10b981', '#60a5fa', '#a78bfa', '#fbbf24', '#f472b6', '#2dd4bf', '#fb7185'];
         let db = JSON.parse(localStorage.getItem('ramadan_db_v8')) || {};
+        
+        // Inisialisasi tanggal hari ini
         let selectedDate = new Date().toISOString().split('T')[0];
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('sidebar-open');
+        function changeDate(newDate) {
+            selectedDate = newDate;
+            const dateObj = new Date(newDate);
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById('currentDateDisplay').innerText = dateObj.toLocaleDateString('id-ID', options);
+            loadDayData();
         }
 
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-open'); }
         function toggleFolder(id) {
             const content = document.getElementById(id);
             const icon = document.getElementById('icon-' + id);
@@ -198,13 +210,8 @@
         function toggleMusic() {
             const audio = document.getElementById('bgMusic');
             if (audio.src) {
-                if (audio.paused) {
-                    audio.play();
-                    document.getElementById('playBtn').innerText = '⏸';
-                } else {
-                    audio.pause();
-                    document.getElementById('playBtn').innerText = '▶';
-                }
+                if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
+                else { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
             }
         }
 
@@ -212,10 +219,12 @@
             const user = document.getElementById('userSelect').value;
             const tasks = [];
             document.querySelectorAll('.task-card.active').forEach(card => tasks.push(card.dataset.task));
+            
             if(!db[user]) db[user] = {};
             db[user][selectedDate] = tasks;
+            
             localStorage.setItem('ramadan_db_v8', JSON.stringify(db));
-            alert('Alhamdulillah! Progress ' + user + ' hari ini tersimpan.');
+            alert(`Sip! Progres ${user} tanggal ${selectedDate} tersimpan.`);
         }
 
         function loadDayData() {
@@ -231,9 +240,7 @@
         function openChart() {
             document.getElementById('chartModal').style.display = 'flex';
             const ctx = document.getElementById('progressChart').getContext('2d');
-            const dataPoin = names.map(name => {
-                return (db[name] && db[name][selectedDate]) ? db[name][selectedDate].length : 0;
-            });
+            const dataPoin = names.map(name => (db[name] && db[name][selectedDate]) ? db[name][selectedDate].length : 0);
 
             if(window.myChart) window.myChart.destroy();
             window.myChart = new Chart(ctx, {
@@ -260,14 +267,12 @@
             });
         }
 
-        function closeChart() {
-            document.getElementById('chartModal').style.display = 'none';
-        }
+        function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
         window.onload = () => {
-            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('id-ID', options);
-            loadDayData();
+            // Set default date picker ke hari ini
+            document.getElementById('datePicker').value = selectedDate;
+            changeDate(selectedDate);
         };
     </script>
 </body>
