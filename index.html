@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro - v19 Updated</title>
+    <title>Ramadan Tracker Premium - v18</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -18,26 +18,36 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .task-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        .task-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         .task-card.active {
             background: rgba(16, 185, 129, 0.15);
             border-color: #10b981;
             transform: translateY(-2px);
         }
         .checkbox-custom {
-            width: 24px; height: 24px; border: 2px solid #334155; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
-        .active .checkbox-custom { background: #10b981; border-color: #10b981; }
+        .active .checkbox-custom {
+            background: #10b981;
+            border-color: #10b981;
+        }
         .folder-content { display: none; animation: fadeIn 0.3s ease-out; }
         .folder-content.open { display: block; }
-        #sidebar, #chartModal { display: none; }
-        .sidebar-open { display: block !important; animation: slideIn 0.3s forwards; }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        #chartModal { display: none; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="min-h-screen pb-12">
 
     <div class="max-w-md mx-auto px-6">
         <header class="pt-10 pb-6 flex justify-between items-end">
@@ -50,29 +60,11 @@
                     <input type="date" id="datePicker" onchange="changeDate(this.value)" class="bg-transparent text-[11px] font-bold text-emerald-400 outline-none uppercase">
                 </div>
             </div>
-            <div class="flex space-x-2">
-                <button onclick="openChart()" class="glass w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-lg">📊</button>
-                <button onclick="toggleSidebar()" class="glass w-12 h-12 rounded-2xl flex items-center justify-center text-xl text-emerald-400">🎵</button>
-            </div>
+            <button onclick="openChart()" class="glass w-12 h-12 rounded-2xl flex items-center justify-center text-xl hover:scale-110 transition active:scale-95 shadow-lg shadow-emerald-900/20">📊</button>
         </header>
 
-        <div id="sidebar" class="fixed inset-y-0 right-0 w-72 glass z-[150] p-6 shadow-2xl">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="font-black text-emerald-400 italic uppercase tracking-widest text-sm">Playlist</h3>
-                <button onclick="toggleSidebar()" class="text-slate-500 font-bold">✕</button>
-            </div>
-            <div class="space-y-2">
-                <button onclick="playTrack('music/asmaun-nabi.mp3', 'Asmaun Nabi')" class="w-full text-left p-4 rounded-2xl glass text-xs font-bold hover:bg-emerald-500/10 transition italic">🎵 Asmaun Nabi</button>
-                <button onclick="playTrack('music/lagu-kesayangan-arif.mp3', 'Lagu Arif')" class="w-full text-left p-4 rounded-2xl glass text-xs font-bold hover:bg-emerald-500/10 transition italic">🎵 Lagu Arif</button>
-            </div>
-            <div class="mt-8 p-4 glass rounded-2xl text-center">
-                <p id="trackTitle" class="text-[9px] font-black text-emerald-500 mb-3 uppercase tracking-widest">Pilih Lagu</p>
-                <button id="playBtn" onclick="toggleMusic()" class="bg-emerald-500 text-slate-950 w-12 h-12 rounded-full mx-auto flex items-center justify-center font-bold text-xl">▶</button>
-                <audio id="bgMusic" loop></audio>
-            </div>
-        </div>
-
-        <div class="glass p-5 rounded-[2.5rem] mb-8 shadow-2xl">
+        <div class="glass p-5 rounded-[2.5rem] mb-8 shadow-2xl relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl -mr-16 -mt-16"></div>
             <label class="block mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500/80">Profil Anggota</label>
             <select id="userSelect" onchange="loadDayData()" class="w-full bg-transparent text-xl font-bold outline-none cursor-pointer appearance-none">
                 <option value="Arif" class="bg-slate-900">Arif</option>
@@ -85,42 +77,77 @@
             </select>
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-5">
             <div class="glass rounded-[2rem] overflow-hidden border border-slate-800">
                 <button onclick="toggleFolder('folderSholat')" class="w-full p-6 flex justify-between items-center bg-slate-900/40">
-                    <span class="text-[11px] font-black uppercase tracking-widest text-emerald-400 italic">Sholat & Rawatib</span>
-                    <span id="icon-folderSholat">▼</span>
+                    <span class="text-[11px] font-black uppercase tracking-widest text-emerald-400 italic">Sholat Berjamaah</span>
+                    <span id="icon-folderSholat" class="text-xs opacity-40">▼</span>
                 </button>
                 <div id="folderSholat" class="folder-content px-4 pb-4 space-y-2">
-                    <div onclick="toggleTask(this)" data-task="js" class="task-card glass p-4 rounded-2xl flex justify-between items-center italic"><span class="text-sm font-bold">Jamaah Shubuh</span><div class="checkbox-custom"></div></div>
-                    <div onclick="toggleTask(this)" data-task="jd" class="task-card glass p-4 rounded-2xl flex justify-between items-center italic"><span class="text-sm font-bold">Jamaah Dzuhur</span><div class="checkbox-custom"></div></div>
-                    <div onclick="toggleTask(this)" data-task="ja" class="task-card glass p-4 rounded-2xl flex justify-between items-center italic"><span class="text-sm font-bold">Jamaah Ashar</span><div class="checkbox-custom"></div></div>
-                    <div onclick="toggleTask(this)" data-task="jm" class="task-card glass p-4 rounded-2xl flex justify-between items-center italic"><span class="text-sm font-bold">Jamaah Maghrib</span><div class="checkbox-custom"></div></div>
-                    <div onclick="toggleTask(this)" data-task="ji" class="task-card glass p-4 rounded-2xl flex justify-between items-center italic"><span class="text-sm font-bold">Jamaah Isya</span><div class="checkbox-custom"></div></div>
+                    <div onclick="toggleTask(this)" data-task="js" class="task-card glass p-4 rounded-2xl flex justify-between items-center border border-slate-800 italic">
+                        <span class="text-sm font-bold">Jamaah Shubuh</span>
+                        <div class="checkbox-custom text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="jd" class="task-card glass p-4 rounded-2xl flex justify-between items-center border border-slate-800 italic">
+                        <span class="text-sm font-bold">Jamaah Dzuhur</span>
+                        <div class="checkbox-custom text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="ja" class="task-card glass p-4 rounded-2xl flex justify-between items-center border border-slate-800 italic">
+                        <span class="text-sm font-bold">Jamaah Ashar</span>
+                        <div class="checkbox-custom text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="jm" class="task-card glass p-4 rounded-2xl flex justify-between items-center border border-slate-800 italic">
+                        <span class="text-sm font-bold">Jamaah Maghrib</span>
+                        <div class="checkbox-custom text-[10px]"></div>
+                    </div>
+                    <div onclick="toggleTask(this)" data-task="ji" class="task-card glass p-4 rounded-2xl flex justify-between items-center border border-slate-800 italic">
+                        <span class="text-sm font-bold">Jamaah Isya</span>
+                        <div class="checkbox-custom text-[10px]"></div>
+                    </div>
                 </div>
             </div>
 
-            <div onclick="toggleTask(this)" data-task="tilawah" class="task-card glass p-6 rounded-[2rem] flex justify-between items-center border border-slate-800 font-bold italic">Tilawah Qur'an <div class="checkbox-custom"></div></div>
+            <div class="glass rounded-[2rem] overflow-hidden border border-slate-800">
+                <button onclick="toggleFolder('folderTilawah')" class="w-full p-6 flex justify-between items-center bg-slate-900/40">
+                    <span class="text-[11px] font-black uppercase tracking-widest text-white italic">Tilawah (Halaman)</span>
+                    <span id="icon-folderTilawah" class="text-xs opacity-40">▼</span>
+                </button>
+                <div id="folderTilawah" class="folder-content p-6">
+                    <div class="grid grid-cols-5 gap-3">
+                        <script>
+                            for(let i=1; i<=20; i++) {
+                                document.write(`<div onclick="togglePage(this)" data-page="${i}" class="page-box aspect-square flex items-center justify-center glass border border-slate-800 rounded-xl text-xs font-bold cursor-pointer hover:border-emerald-500 transition">${i}</div>`);
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+
             <div onclick="toggleTask(this)" data-task="sedekah" class="task-card glass p-6 rounded-[2rem] flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400">Sedekah <div class="checkbox-custom"></div></div>
             <div onclick="toggleTask(this)" data-task="riyadho" class="task-card glass p-6 rounded-[2rem] flex justify-between items-center border border-slate-800 font-bold italic text-rose-400">Riyadho <div class="checkbox-custom"></div></div>
         </div>
 
-        <button onclick="saveCurrentDay()" id="saveBtn" class="w-full mt-10 bg-gradient-to-br from-emerald-500 to-teal-700 text-slate-950 font-black py-5 rounded-[2rem] shadow-2xl uppercase tracking-widest italic transition active:scale-95">SIMPAN PROGRESS</button>
+        <button onclick="saveCurrentDay()" id="saveBtn" class="w-full mt-10 bg-gradient-to-br from-emerald-500 to-teal-700 text-slate-950 font-black py-5 rounded-[2rem] shadow-2xl shadow-emerald-500/20 uppercase tracking-[0.2em] italic active:scale-[0.98] transition">SIMPAN PROGRESS</button>
     </div>
 
-    <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[200] p-6 flex flex-col">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-black italic text-emerald-400 uppercase">Progres Grup</h2>
+    <div id="chartModal" class="fixed inset-0 bg-slate-950/95 z-[100] p-6 flex flex-col">
+        <div class="flex justify-between items-center mb-10 pt-4">
+            <h2 class="text-2xl font-black italic tracking-tighter text-emerald-400 uppercase">Progres Online Grup</h2>
             <button onclick="closeChart()" class="glass w-12 h-12 rounded-2xl font-bold text-red-400">✕</button>
         </div>
-        <div class="bg-slate-900 p-4 rounded-[2rem] flex-grow flex items-center">
+        <div class="bg-slate-900/50 p-6 rounded-[2.5rem] border border-slate-800 flex-grow flex items-center mb-6">
             <canvas id="progressChart"></canvas>
+        </div>
+        <div class="glass p-6 rounded-[2rem] border border-slate-800">
+            <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Live Update</h3>
+            <div id="statusFeed" class="text-xs font-bold text-emerald-400 italic space-y-2">Syncing database...</div>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbykxE6hI6rNSQsWt3fDv9OKY4-tspfMKq3-lcpFpqCJbIfotnBj1t52JOTIOvOmKvxg/exec";
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkaPve8ZmDaia6ffK05Akrp12N8g7MwIsagZMCXC1fzIXoDzgFjOy_jfawtEBdv5Zr/exec";
+        
         let dbOnline = [];
         let selectedDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 
@@ -128,10 +155,16 @@
 
         async function fetchDataOnline() {
             try {
-                const res = await fetch(`${SCRIPT_URL}?t=${new Date().getTime()}`);
-                dbOnline = await res.json();
+                const response = await fetch(`${SCRIPT_URL}?t=${new Date().getTime()}`);
+                dbOnline = await response.json();
                 loadDayData();
-            } catch (e) { console.error("Sync Error"); }
+                updateStatusFeed();
+            } catch (e) { console.error("Sync error"); }
+        }
+
+        function changeDate(newDate) {
+            selectedDate = newDate;
+            loadDayData();
         }
 
         function toggleTask(el) {
@@ -139,27 +172,13 @@
             el.querySelector('.checkbox-custom').innerHTML = el.classList.contains('active') ? '✔' : '';
         }
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-open'); }
-        function toggleFolder(id) { document.getElementById(id).classList.toggle('open'); }
-        function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
-        function changeDate(d) { selectedDate = d; loadDayData(); }
-
-        function playTrack(url, title) {
-            const audio = document.getElementById('bgMusic');
-            audio.src = url; document.getElementById('trackTitle').innerText = title;
-            audio.play(); document.getElementById('playBtn').innerText = '⏸';
-        }
-
-        function toggleMusic() {
-            const audio = document.getElementById('bgMusic');
-            if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
-            else { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
-        }
+        function togglePage(el) { el.classList.toggle('active'); }
 
         async function saveCurrentDay() {
             const user = document.getElementById('userSelect').value;
             const tasks = [];
             document.querySelectorAll('.task-card.active').forEach(card => tasks.push(card.dataset.task));
+            document.querySelectorAll('.page-box.active').forEach(box => tasks.push(`pg-${box.dataset.page}`));
             
             const btn = document.getElementById('saveBtn');
             btn.innerText = "MENGIRIM..."; btn.disabled = true;
@@ -169,9 +188,9 @@
                     method: "POST",
                     body: JSON.stringify({ nama: user, tugas: tasks, tanggal: selectedDate })
                 });
-                alert("Berhasil disimpan!");
+                alert("Alhamdulillah! Progres Online.");
                 await fetchDataOnline();
-            } catch (e) { alert("Gagal Simpan."); }
+            } catch (e) { alert("Gagal Simpan. Cek Izin Google."); }
             finally { btn.innerText = "SIMPAN PROGRESS"; btn.disabled = false; }
         }
 
@@ -185,6 +204,19 @@
                 card.classList.toggle('active', isActive);
                 card.querySelector('.checkbox-custom').innerHTML = isActive ? '✔' : '';
             });
+
+            document.querySelectorAll('.page-box').forEach(box => {
+                const isActive = savedTasks.includes(`pg-${box.dataset.page}`);
+                box.classList.toggle('active', isActive);
+            });
+        }
+
+        function updateStatusFeed() {
+            const feed = document.getElementById('statusFeed');
+            const latest = dbOnline.filter(d => d.tanggal === selectedDate).slice(-2).reverse();
+            feed.innerHTML = latest.length > 0 
+                ? latest.map(d => `<div>🟢 <span class="text-white">${d.nama}</span> baru saja update!</div>`).join('')
+                : "Belum ada progres hari ini.";
         }
 
         function openChart() {
@@ -200,14 +232,30 @@
                 type: 'bar',
                 data: {
                     labels: names,
-                    datasets: [{ data: dataPoin, backgroundColor: '#10b981', borderRadius: 10 }]
+                    datasets: [{
+                        data: dataPoin, 
+                        backgroundColor: '#10b981',
+                        borderRadius: 15,
+                        barThickness: 22
+                    }]
                 },
                 options: {
                     indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-                    scales: { x: { beginAtZero: true, max: 10 }, y: { ticks: { color: 'white' } } },
+                    scales: {
+                        x: { beginAtZero: true, max: 30, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
+                        y: { ticks: { color: 'white', font: { weight: 'bold', size: 12 } }, grid: { display: false } }
+                    },
                     plugins: { legend: { display: false } }
                 }
             });
+        }
+
+        function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
+        function toggleFolder(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            content.classList.toggle('open');
+            icon.innerText = content.classList.contains('open') ? '▲' : '▼';
         }
 
         window.onload = fetchDataOnline;
