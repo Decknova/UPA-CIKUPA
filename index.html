@@ -186,7 +186,18 @@
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
         const chartColors = ['#10b981', '#60a5fa', '#a78bfa', '#fbbf24', '#f472b6', '#2dd4bf', '#fb7185'];
         let db = JSON.parse(localStorage.getItem('ramadan_db_v8')) || {};
-        let selectedDate = new Date().toISOString().split('T')[0];
+        
+        // FUNGSI BARU: Mendapatkan tanggal real-time zona Jakarta (WIB)
+        function getJakartaDate() {
+            const now = new Date();
+            // Offset WIB adalah UTC+7
+            const jakartaOffset = 7 * 60; 
+            const localOffset = now.getTimezoneOffset(); // dalam menit
+            const jakartaTime = new Date(now.getTime() + (jakartaOffset + localOffset) * 60000);
+            return jakartaTime.toISOString().split('T')[0];
+        }
+
+        let selectedDate = getJakartaDate();
 
         function changeDate(newDate) {
             selectedDate = newDate;
@@ -249,7 +260,6 @@
         function openChart() {
             document.getElementById('chartModal').style.display = 'flex';
             const ctx = document.getElementById('progressChart').getContext('2d');
-            // Menyesuaikan total tugas maksimal (sekarang menjadi 16 karena tambahan 5 tugas rawatib)
             const dataPoin = names.map(name => (db[name] && db[name][selectedDate]) ? db[name][selectedDate].length : 0);
 
             if(window.myChart) window.myChart.destroy();
@@ -280,8 +290,9 @@
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
         window.onload = () => {
-            document.getElementById('datePicker').value = selectedDate;
-            changeDate(selectedDate);
+            const today = getJakartaDate();
+            document.getElementById('datePicker').value = today;
+            changeDate(today);
         };
     </script>
 </body>
