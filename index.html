@@ -187,14 +187,15 @@
         const chartColors = ['#10b981', '#60a5fa', '#a78bfa', '#fbbf24', '#f472b6', '#2dd4bf', '#fb7185'];
         let db = JSON.parse(localStorage.getItem('ramadan_db_v8')) || {};
         
-        // FUNGSI BARU: Mendapatkan tanggal real-time zona Jakarta (WIB)
+        // FUNGSI PERBAIKAN: Selalu real-time Jakarta (WIB) saat dipanggil
         function getJakartaDate() {
-            const now = new Date();
-            // Offset WIB adalah UTC+7
-            const jakartaOffset = 7 * 60; 
-            const localOffset = now.getTimezoneOffset(); // dalam menit
-            const jakartaTime = new Date(now.getTime() + (jakartaOffset + localOffset) * 60000);
-            return jakartaTime.toISOString().split('T')[0];
+            const formatter = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Asia/Jakarta',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            return formatter.format(new Date());
         }
 
         let selectedDate = getJakartaDate();
@@ -289,6 +290,7 @@
 
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
+        // EKSEKUSI UTAMA SAAT LOAD/REFRESH
         window.onload = () => {
             const today = getJakartaDate();
             document.getElementById('datePicker').value = today;
