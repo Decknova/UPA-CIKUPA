@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro - Sync v11</title>
+    <title>Ramadan Tracker Pro - Final Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; overflow-x: hidden; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
         .task-card.active { border-color: #10b981; background-color: #064e3b; }
         .page-box.active { background-color: #10b981; border-color: #10b981; color: #020617; }
         .folder-content { display: none; }
@@ -41,7 +40,7 @@
             </div>
         </header>
 
-        <div id="sidebar" class="fixed inset-y-0 right-0 w-72 bg-slate-950 border-l border-slate-800 z-[70] p-6 shadow-2xl">
+        <div id="sidebar" class="fixed inset-y-0 right-0 w-72 bg-slate-950 border-l border-slate-800 z-[70] p-6 shadow-2xl overflow-y-auto">
             <div class="flex justify-between items-center mb-8">
                 <h3 class="font-black text-emerald-400 italic uppercase tracking-widest text-sm">Playlist</h3>
                 <button onclick="toggleSidebar()" class="text-slate-500 font-bold">✕</button>
@@ -52,7 +51,7 @@
             </div>
             <div class="mt-8 p-4 bg-slate-900 rounded-2xl border border-slate-800 text-center">
                 <p id="trackTitle" class="text-[9px] font-black text-emerald-500 mb-3 uppercase tracking-widest italic">Pilih Lagu</p>
-                <button id="playBtn" onclick="toggleMusic()" class="bg-emerald-500 text-slate-950 w-12 h-12 rounded-full mx-auto flex items-center justify-center font-bold text-xl shadow-lg">▶</button>
+                <button id="playBtn" onclick="toggleMusic()" class="bg-emerald-500 text-slate-950 w-12 h-12 rounded-full mx-auto flex items-center justify-center font-bold text-xl">▶</button>
                 <audio id="bgMusic" loop></audio>
             </div>
         </div>
@@ -72,7 +71,7 @@
 
         <div class="space-y-4">
             <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg">
-                <button onclick="toggleFolder('folderSholat')" class="w-full p-5 flex justify-between items-center bg-slate-900">
+                <button onclick="toggleFolder('folderSholat')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
                     <span class="font-black text-[10px] tracking-widest text-emerald-400 uppercase italic">Sholat Berjamaah + Rawatib</span>
                     <span id="icon-folderSholat" class="text-xs">▼</span>
                 </button>
@@ -91,7 +90,7 @@
             </div>
 
             <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg text-yellow-500">
-                <button onclick="toggleFolder('folderSunnah')" class="w-full p-5 flex justify-between items-center bg-slate-900">
+                <button onclick="toggleFolder('folderSunnah')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
                     <span class="font-black text-[10px] tracking-widest uppercase italic">Sholat Sunnah Nawafil</span>
                     <span id="icon-folderSunnah" class="text-xs">▼</span>
                 </button>
@@ -103,7 +102,7 @@
             </div>
 
             <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg text-white">
-                <button onclick="toggleFolder('folderTilawah')" class="w-full p-5 flex justify-between items-center bg-slate-900">
+                <button onclick="toggleFolder('folderTilawah')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
                     <span class="font-black text-[10px] tracking-widest uppercase italic font-bold">Tilawah Qur'an (Halaman)</span>
                     <span id="icon-folderTilawah" class="text-xs">▼</span>
                 </button>
@@ -118,8 +117,8 @@
                 </div>
             </div>
 
-            <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400">Sedekah Shubuh <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg"></div></div>
-            <div onclick="toggleTask(this)" data-task="riyadho" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-rose-400">Riyadho <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg"></div></div>
+            <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400">Sedekah Shubuh <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
+            <div onclick="toggleTask(this)" data-task="riyadho" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-rose-400">Riyadho <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
         </div>
 
         <button onclick="saveCurrentDay()" id="saveBtn" class="w-full mt-10 bg-gradient-to-br from-emerald-600 to-teal-800 text-white font-black py-5 rounded-3xl shadow-xl uppercase tracking-widest italic active:scale-95 transition shadow-emerald-900/20">SIMPAN PROGRESS</button>
@@ -143,20 +142,20 @@
         let dbOnline = [];
         let selectedDate = new Date().toISOString().split('T')[0];
 
-        // Set default date picker ke hari ini
+        // Setel tanggal kalender ke hari ini
         document.getElementById('datePicker').value = selectedDate;
 
         async function fetchDataOnline() {
             try {
                 const response = await fetch(SCRIPT_URL);
                 dbOnline = await response.json();
-                loadDayData(); // Mengisi centang setelah data berhasil diambil
-            } catch (e) { console.error("Gagal sinkronisasi data online"); }
+                loadDayData(); // Isi centang di layar setelah data dimuat
+            } catch (e) { console.error("Gagal sinkron data online"); }
         }
 
         function changeDate(newDate) {
             selectedDate = newDate;
-            loadDayData();
+            loadDayData(); // Muat ulang centang saat tanggal kalender diganti
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-open'); }
@@ -177,7 +176,9 @@
         async function saveCurrentDay() {
             const user = document.getElementById('userSelect').value;
             const tasks = [];
+            // Ambil tugas centang biasa
             document.querySelectorAll('.task-card.active').forEach(card => tasks.push(card.dataset.task));
+            // Ambil halaman tilawah
             document.querySelectorAll('.page-box.active').forEach(box => tasks.push('pg-' + box.dataset.page));
             
             const btn = document.getElementById('saveBtn');
@@ -189,26 +190,26 @@
                     method: "POST",
                     body: JSON.stringify({ nama: user, tugas: tasks, tanggal: selectedDate })
                 });
-                alert(`Alhamdulillah! Progres ${user} berhasil tersimpan.`);
-                await fetchDataOnline(); // Refresh data online setelah simpan
+                alert(`Alhamdulillah! Data ${user} tanggal ${selectedDate} tersimpan.`);
+                await fetchDataOnline(); // Ambil data terbaru agar centang tidak hilang
             } catch (e) { alert('Gagal kirim data.'); } 
             finally { btn.innerText = "SIMPAN PROGRESS"; btn.disabled = false; }
         }
 
         function loadDayData() {
             const user = document.getElementById('userSelect').value;
-            // Cari data paling baru untuk user + tanggal yang dipilih
+            // Cari data paling baru untuk user tersebut pada tanggal yang dipilih
             const userHistory = dbOnline.filter(d => d.nama.trim() === user.trim() && d.tanggal === selectedDate);
             const savedTasks = userHistory.length > 0 ? userHistory[userHistory.length - 1].tugas : [];
 
-            // Isi kembali centang tugas utama
+            // Isi centang tugas utama
             document.querySelectorAll('.task-card').forEach(card => {
                 const isSelected = savedTasks.includes(card.dataset.task);
                 card.classList.toggle('active', isSelected);
                 card.querySelector('.box').innerHTML = isSelected ? '✔' : '';
             });
 
-            // Isi kembali centang halaman tilawah
+            // Isi centang halaman tilawah
             document.querySelectorAll('.page-box').forEach(box => {
                 const isPageSelected = savedTasks.includes('pg-' + box.dataset.page);
                 box.classList.toggle('active', isPageSelected);
@@ -234,7 +235,7 @@
             const ctx = document.getElementById('progressChart').getContext('2d');
             
             const dataPoin = names.map(name => {
-                // Ambil data terbaru anggota untuk tanggal yang sedang dipilih di kalender
+                // Ambil skor terbaru anggota sesuai tanggal yang dipilih di kalender
                 const entry = dbOnline.filter(d => d.nama.trim() === name.trim() && d.tanggal === selectedDate).pop();
                 return entry ? entry.tugas.length : 0;
             });
@@ -252,7 +253,7 @@
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // Nama di samping agar lebih rapi di HP
+                    indexAxis: 'y', // Nama di samping agar rapi di HP
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
@@ -266,7 +267,7 @@
 
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
-        // Load data grup saat web dibuka pertama kali
+        // Muat data saat pertama kali aplikasi dibuka
         window.onload = async () => {
             await fetchDataOnline();
         };
