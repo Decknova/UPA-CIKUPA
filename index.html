@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro v11 - Firebase Cloud</title>
+    <title>Ramadan Tracker Pro v13 - Auto Reset WIB</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -18,10 +18,10 @@
         #sidebar, #chartModal { display: none; }
         .sidebar-open { display: block !important; animation: slideIn 0.3s forwards; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         .page-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
         .page-box { aspect-ratio: 1; border: 1px solid #1e293b; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; transition: all 0.2s; cursor: pointer; }
         .page-box.active { background-color: #10b981; border-color: #10b981; color: #020617; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen pb-20">
@@ -40,14 +40,14 @@
         </header>
 
         <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-4">
-            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Pilih Tanggal Progres</label>
-            <input type="date" id="datePicker" onchange="changeDate(this.value)" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 text-white cursor-pointer">
+            <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Pilih Tanggal</label>
+            <input type="date" id="datePicker" onchange="changeDate(this.value)" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl text-lg font-bold outline-none text-white cursor-pointer">
         </div>
 
         <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-6">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Anggota Kelompok</label>
             <div class="relative">
-                <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 appearance-none cursor-pointer">
+                <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl text-lg font-bold outline-none appearance-none cursor-pointer">
                     <option value="Arif">Arif</option><option value="Heru">Heru</option><option value="Fajar">Fajar</option><option value="Faisal">Faisal</option><option value="Mulyadi">Mulyadi</option><option value="Yudi">Yudi</option><option value="Kang Deny">Kang Deny</option>
                 </select>
                 <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">▼</div>
@@ -61,11 +61,11 @@
                     <span id="icon-folderSholat" class="text-xs text-slate-500">▼</span>
                 </button>
                 <div id="folderSholat" class="folder-content px-4 pb-4 space-y-2">
-                    <div onclick="toggleTask(this)" data-task="js" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="jd" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="ja" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Ashar</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="jm" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="ji" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Jamaah Shubuh" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Jamaah Dzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Jamaah Ashar" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Ashar</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Jamaah Maghrib" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Jamaah Isya" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Jamaah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                 </div>
             </div>
 
@@ -75,11 +75,11 @@
                     <span id="icon-folderRawatib" class="text-xs text-slate-500">▼</span>
                 </button>
                 <div id="folderRawatib" class="folder-content px-4 pb-4 space-y-2">
-                    <div onclick="toggleTask(this)" data-task="qshubuh" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Qobliyah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="qdzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Qobliyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="bdzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Ba'diyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="bmaghrib" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Ba'diyah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="bisya" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Ba'diyah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Qobliyah Shubuh" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Qobliyah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Qobliyah Dzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Qobliyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Ba'diyah Dzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Ba'diyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Ba'diyah Maghrib" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Ba'diyah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Ba'diyah Isya" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Ba'diyah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                 </div>
             </div>
 
@@ -99,15 +99,15 @@
                     <span id="icon-folderSunnah" class="text-xs text-slate-500">▼</span>
                 </button>
                 <div id="folderSunnah" class="folder-content px-4 pb-4 space-y-2">
-                    <div onclick="toggleTask(this)" data-task="dhuha" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Dhuha</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="tahajud" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Tahajud</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="witir" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Witir</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Dhuha" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Dhuha</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Tahajud" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Tahajud</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="Witir" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Witir</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                 </div>
             </div>
 
             <div class="space-y-3">
-                <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400"><span>Sedekah Subuh</span><div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
-                <div onclick="toggleTask(this)" data-task="riyadho" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-rose-400"><span>Riyadho</span><div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
+                <div onclick="toggleTask(this)" data-task="Sedekah Subuh" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400"><span>Sedekah Subuh</span><div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
+                <div onclick="toggleTask(this)" data-task="Riyadho" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-rose-400"><span>Riyadho</span><div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
             </div>
         </div>
 
@@ -132,7 +132,6 @@
     </div>
 
     <script>
-        // 1. Firebase Config (Dari Hasil Copy-Paste Kamu)
         const firebaseConfig = {
             apiKey: "AIzaSyC21SVp8RL6O3aJtRJtVCelBgGCmsJpiu8",
             authDomain: "ramdhan-tacker.firebaseapp.com",
@@ -145,39 +144,46 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // 2. Variables
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
         const chartColors = ['#10b981', '#60a5fa', '#a78bfa', '#fbbf24', '#f472b6', '#2dd4bf', '#fb7185'];
         let db = {};
         
-        // 3. Jakarta Real-time Date
         function getJakartaDate() {
             return new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
         }
         let selectedDate = getJakartaDate();
 
-        // 4. Initialization
+        // LOGIKA AUTO-RESET JAM 00:00 WIB
+        function checkAutoReset() {
+            const nowJakarta = getJakartaDate();
+            if (nowJakarta !== selectedDate) {
+                console.log("Tengah malam terdeteksi! Reset ke hari baru...");
+                selectedDate = nowJakarta;
+                document.getElementById('datePicker').value = nowJakarta;
+                changeDate(nowJakarta);
+            }
+        }
+        // Cek setiap 1 menit agar presisi
+        setInterval(checkAutoReset, 60000);
+
         const grid = document.getElementById('pageGridContainer');
         for(let i=1; i<=20; i++) {
             const div = document.createElement('div');
             div.className = 'page-box';
             div.innerText = i;
-            div.dataset.task = 'page-' + i;
+            div.dataset.task = 'Tilawah Halaman ' + i;
             div.onclick = function() { this.classList.toggle('active'); };
             grid.appendChild(div);
         }
 
-        // Listener Real-time Firebase
-        database.ref('ramadan_db_v8').on('value', (snapshot) => {
+        database.ref('ramadan_db_v12').on('value', (snapshot) => {
             db = snapshot.val() || {};
             loadDayData();
         });
 
-        // 5. Functions
         function changeDate(newDate) {
             selectedDate = newDate;
-            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            document.getElementById('currentDateDisplay').innerText = new Date(newDate).toLocaleDateString('id-ID', options);
+            document.getElementById('currentDateDisplay').innerText = new Date(newDate).toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
             loadDayData();
         }
 
@@ -212,10 +218,8 @@
             const user = document.getElementById('userSelect').value;
             const tasks = [];
             document.querySelectorAll('.task-card.active, .page-box.active').forEach(el => tasks.push(el.dataset.task));
-            
-            database.ref('ramadan_db_v8/' + user + '/' + selectedDate).set(tasks)
-            .then(() => alert(`Alhamdulillah! Progres ${user} tersimpan.`))
-            .catch((err) => alert("Error: " + err.message));
+            database.ref('ramadan_db_v12/' + user + '/' + selectedDate).set(tasks)
+            .then(() => alert(`Alhamdulillah! Progres ${user} tersimpan.`));
         }
 
         function loadDayData() {
