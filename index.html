@@ -3,160 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ramadan Tracker</title>
-
+<title>Ramadan Tracker Pro v8</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-body { font-family: 'Plus Jakarta Sans', sans-serif; background:#020617; }
-.task-card.active { background:#064e3b; border-color:#10b981; }
-.folder-content { display:none }
-.folder-content.open { display:block }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background-color:#020617; overflow-x:hidden; }
+.no-scrollbar::-webkit-scrollbar { display:none; }
+.task-card.active { border-color:#10b981; background-color:#064e3b; }
+.folder-content { display:none; }
+.folder-content.open { display:block; }
+#sidebar,#chartModal{ display:none; }
+.sidebar-open{ display:block!important; animation:slideIn .3s forwards; }
+@keyframes slideIn{ from{transform:translateX(100%)} to{transform:translateX(0)} }
 </style>
 </head>
 
-<body class="text-slate-100 pb-20">
+<body class="text-slate-100 min-h-screen pb-20">
+<div class="max-w-md mx-auto px-5">
 
-<div class="max-w-md mx-auto px-4">
-
-<!-- HEADER -->
-<header class="flex justify-between items-center py-6">
-  <h1 class="text-xl font-black text-emerald-400">RAMADAN TRACKER</h1>
-  <button onclick="openChart()" class="bg-slate-900 p-2 rounded-xl">📊</button>
+<header class="flex justify-between items-center py-8">
+  <div>
+    <h1 class="text-2xl font-extrabold text-emerald-400 italic uppercase tracking-tighter">
+      RAMADAN <span class="text-white font-normal">TRACKER</span>
+    </h1>
+    <p id="currentDateDisplay"
+       class="text-slate-400 text-[10px] font-bold tracking-widest uppercase mt-1 italic"></p>
+  </div>
+  <div class="flex items-center space-x-2">
+    <button onclick="openChart()" class="bg-slate-900 p-2 rounded-xl border border-slate-800 text-lg">📊</button>
+    <button onclick="toggleSidebar()" class="bg-emerald-500 text-slate-950 p-2 rounded-xl shadow-lg">☰</button>
+  </div>
 </header>
 
-<!-- PILIH TANGGAL -->
+<!-- DATE PICKER (TAMBAHAN SAJA) -->
 <input type="date" id="datePicker"
-class="w-full mb-4 bg-slate-900 p-4 rounded-xl border border-slate-800">
+class="w-full mb-6 bg-slate-900 border border-slate-800 p-4 rounded-2xl text-xs font-bold">
 
-<!-- PILIH USER -->
+<div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-6 shadow-xl">
+<label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Anggota</label>
 <select id="userSelect" onchange="loadDayData()"
-class="w-full mb-6 bg-slate-900 p-4 rounded-xl font-bold">
-  <option>Arif</option>
-  <option>Heru</option>
-  <option>Fajar</option>
-  <option>Faisal</option>
-  <option>Mulyadi</option>
-  <option>Yudi</option>
-  <option>Kang Deny</option>
+class="w-full bg-slate-800 p-4 rounded-2xl text-lg font-bold">
+<option>Arif</option><option>Heru</option><option>Fajar</option>
+<option>Faisal</option><option>Mulyadi</option><option>Yudi</option><option>Kang Deny</option>
 </select>
-
-<!-- TASK -->
-<div class="space-y-3">
-  <div onclick="toggleTask(this)" data-task="subuh"
-  class="task-card bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between">
-    Jamaah Subuh <span class="box"></span>
-  </div>
-
-  <div onclick="toggleTask(this)" data-task="dzuhur"
-  class="task-card bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between">
-    Jamaah Dzuhur <span class="box"></span>
-  </div>
-
-  <div onclick="toggleTask(this)" data-task="tilawah"
-  class="task-card bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between">
-    Tilawah Qur'an <span class="box"></span>
-  </div>
-
-  <div onclick="toggleTask(this)" data-task="sedekah"
-  class="task-card bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between">
-    Sedekah <span class="box"></span>
-  </div>
 </div>
 
-<!-- SIMPAN -->
-<button onclick="saveDay()"
-class="w-full mt-8 bg-emerald-600 py-4 rounded-xl font-black">
-SIMPAN
+<div class="space-y-3">
+<div onclick="toggleTask(this)" data-task="js"
+class="task-card bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between">
+Jamaah Subuh <div class="box"></div></div>
+
+<div onclick="toggleTask(this)" data-task="jd"
+class="task-card bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between">
+Jamaah Dzuhur <div class="box"></div></div>
+
+<div onclick="toggleTask(this)" data-task="tilawah"
+class="task-card bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between">
+Tilawah Qur'an <div class="box"></div></div>
+</div>
+
+<button onclick="saveCurrentDay()"
+class="w-full mt-10 bg-gradient-to-br from-emerald-600 to-teal-800
+text-white font-black py-5 rounded-3xl shadow-xl uppercase tracking-[0.2em] italic">
+Simpan Progress
 </button>
 
 </div>
 
-<!-- MODAL CHART -->
-<div id="chartModal"
-class="fixed inset-0 bg-black/90 hidden items-center justify-center p-4">
-  <div class="bg-slate-900 p-4 rounded-xl w-full max-w-md">
-    <button onclick="closeChart()" class="mb-2">❌</button>
-    <canvas id="chart"></canvas>
-  </div>
+<div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[80] p-4 flex flex-col">
+<button onclick="closeChart()" class="mb-2">❌</button>
+<canvas id="progressChart"></canvas>
 </div>
 
 <script>
-const users = ["Arif","Heru","Fajar","Faisal","Mulyadi","Yudi","Kang Deny"];
-let db = JSON.parse(localStorage.getItem("ramadan_db")) || {};
+const names=["Arif","Heru","Fajar","Faisal","Mulyadi","Yudi","Kang Deny"];
+let db=JSON.parse(localStorage.getItem("ramadan_db_v8"))||{};
 let selectedDate;
 
-// INIT
-window.onload = () => {
-  const today = new Date().toISOString().split("T")[0];
-  document.getElementById("datePicker").value = today;
-  selectedDate = today;
-  loadDayData();
-};
+function toggleSidebar(){
+document.getElementById("sidebar")?.classList.toggle("sidebar-open");
+}
 
-// DATE CHANGE
-datePicker.onchange = e => {
-  selectedDate = e.target.value;
-  loadDayData();
-};
-
-// TOGGLE TASK
 function toggleTask(el){
-  el.classList.toggle("active");
-  el.querySelector(".box").innerText =
-    el.classList.contains("active") ? "✔" : "";
+el.classList.toggle("active");
+el.querySelector(".box").innerHTML=el.classList.contains("active")?"✔":"";
 }
 
-// SAVE
-function saveDay(){
-  const user = userSelect.value;
-  const tasks = [];
-  document.querySelectorAll(".task-card.active")
-    .forEach(t => tasks.push(t.dataset.task));
-
-  if(!db[user]) db[user] = {};
-  db[user][selectedDate] = tasks;
-  localStorage.setItem("ramadan_db", JSON.stringify(db));
-  alert("Tersimpan");
+function saveCurrentDay(){
+const user=userSelect.value;
+const tasks=[];
+document.querySelectorAll(".task-card.active")
+.forEach(t=>tasks.push(t.dataset.task));
+if(!db[user]) db[user]={};
+db[user][selectedDate]=tasks;
+localStorage.setItem("ramadan_db_v8",JSON.stringify(db));
+alert("Tersimpan");
 }
 
-// LOAD
 function loadDayData(){
-  document.querySelectorAll(".task-card").forEach(t=>{
-    t.classList.remove("active");
-    t.querySelector(".box").innerText="";
-  });
-
-  const user = userSelect.value;
-  const data = db[user]?.[selectedDate] || [];
-  data.forEach(task=>{
-    const el = document.querySelector(`[data-task="${task}"]`);
-    if(el){
-      el.classList.add("active");
-      el.querySelector(".box").innerText="✔";
-    }
-  });
+const user=userSelect.value;
+const data=db[user]?.[selectedDate]||[];
+document.querySelectorAll(".task-card").forEach(card=>{
+const ok=data.includes(card.dataset.task);
+card.classList.toggle("active",ok);
+card.querySelector(".box").innerHTML=ok?"✔":"";
+});
 }
 
-// CHART
 function openChart(){
-  chartModal.classList.remove("hidden");
-  const ctx = chart.getContext("2d");
-
-  const data = users.map(u =>
-    db[u]?.[selectedDate]?.length || 0
-  );
-
-  if(window.c) c.destroy();
-  c = new Chart(ctx,{
-    type:"bar",
-    data:{ labels:users, datasets:[{ data }] },
-    options:{ indexAxis:"y" }
-  });
+chartModal.style.display="flex";
+const ctx=progressChart.getContext("2d");
+const data=names.map(n=>db[n]?.[selectedDate]?.length||0);
+if(window.c) c.destroy();
+c=new Chart(ctx,{type:"bar",data:{labels:names,datasets:[{data}]},options:{indexAxis:"y"}});
 }
-function closeChart(){ chartModal.classList.add("hidden"); }
+function closeChart(){ chartModal.style.display="none"; }
+
+// DATE INIT
+window.onload=()=>{
+const today=new Date().toISOString().split("T")[0];
+datePicker.value=today;
+selectedDate=today;
+updateHeaderDate(today);
+loadDayData();
+};
+
+datePicker.addEventListener("change",e=>{
+selectedDate=e.target.value;
+updateHeaderDate(selectedDate);
+loadDayData();
+});
+
+function updateHeaderDate(d){
+currentDateDisplay.innerText=
+new Date(d).toLocaleDateString("id-ID",
+{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+}
 </script>
 
 </body>
