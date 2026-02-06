@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro v8</title>
+    <title>Ramadan Tracker Pro v9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -45,7 +45,6 @@
             to { transform: translateX(0); }
         }
 
-        /* Styling khusus untuk input tanggal agar matching */
         input[type="date"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
             cursor: pointer;
@@ -105,6 +104,20 @@
                     <div onclick="toggleTask(this)" data-task="ja" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic cursor-pointer"><span class="text-sm">Jamaah Ashar</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                     <div onclick="toggleTask(this)" data-task="jm" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic cursor-pointer"><span class="text-sm">Jamaah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                     <div onclick="toggleTask(this)" data-task="ji" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic cursor-pointer"><span class="text-sm">Jamaah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+                <button onclick="toggleFolder('folderRawatib')" class="w-full p-5 flex justify-between items-center hover:bg-slate-800/50 transition">
+                    <span class="font-black text-[10px] tracking-widest text-teal-400 uppercase italic">Sholat Rawatib (Qobliyah/Ba'diyah)</span>
+                    <span id="icon-folderRawatib" class="text-xs text-slate-500">▼</span>
+                </button>
+                <div id="folderRawatib" class="folder-content px-4 pb-4 space-y-2">
+                    <div onclick="toggleTask(this)" data-task="qshubuh" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic cursor-pointer"><span class="text-sm">Qobliyah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="qdzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic cursor-pointer"><span class="text-sm">Qobliyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="bdzuhur" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic cursor-pointer"><span class="text-sm">Ba'diyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="bmaghrib" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic cursor-pointer"><span class="text-sm">Ba'diyah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="bisya" class="task-card bg-slate-900/80 p-4 rounded-2xl flex justify-between items-center border border-slate-800 font-bold italic cursor-pointer"><span class="text-sm">Ba'diyah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                 </div>
             </div>
 
@@ -173,8 +186,6 @@
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
         const chartColors = ['#10b981', '#60a5fa', '#a78bfa', '#fbbf24', '#f472b6', '#2dd4bf', '#fb7185'];
         let db = JSON.parse(localStorage.getItem('ramadan_db_v8')) || {};
-        
-        // Inisialisasi tanggal hari ini
         let selectedDate = new Date().toISOString().split('T')[0];
 
         function changeDate(newDate) {
@@ -219,10 +230,8 @@
             const user = document.getElementById('userSelect').value;
             const tasks = [];
             document.querySelectorAll('.task-card.active').forEach(card => tasks.push(card.dataset.task));
-            
             if(!db[user]) db[user] = {};
             db[user][selectedDate] = tasks;
-            
             localStorage.setItem('ramadan_db_v8', JSON.stringify(db));
             alert(`Sip! Progres ${user} tanggal ${selectedDate} tersimpan.`);
         }
@@ -240,6 +249,7 @@
         function openChart() {
             document.getElementById('chartModal').style.display = 'flex';
             const ctx = document.getElementById('progressChart').getContext('2d');
+            // Menyesuaikan total tugas maksimal (sekarang menjadi 16 karena tambahan 5 tugas rawatib)
             const dataPoin = names.map(name => (db[name] && db[name][selectedDate]) ? db[name][selectedDate].length : 0);
 
             if(window.myChart) window.myChart.destroy();
@@ -259,7 +269,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { beginAtZero: true, max: 11, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
+                        x: { beginAtZero: true, max: 16, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
                         y: { grid: { display: false }, ticks: { color: 'white', font: { weight: 'bold' } } }
                     },
                     plugins: { legend: { display: false } }
@@ -270,7 +280,6 @@
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
         window.onload = () => {
-            // Set default date picker ke hari ini
             document.getElementById('datePicker').value = selectedDate;
             changeDate(selectedDate);
         };
