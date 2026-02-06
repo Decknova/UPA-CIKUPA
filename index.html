@@ -99,7 +99,7 @@
 
             <div class="pt-2 space-y-3">
                 <div onclick="toggleTask(this)" data-task="tilawah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-white">Tilawah Qur'an <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg"></div></div>
-                <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400">Sedekah Shubuh <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg"></div></div>
+                <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400">Sedekah <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg"></div></div>
                 <div onclick="toggleTask(this)" data-task="riyadho" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-rose-400">Riyadho <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg"></div></div>
             </div>
         </div>
@@ -123,12 +123,24 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkaPve8ZmDaia6ffK05Akrp12N8g7MwIsagZMCXC1fzIXoDzgFjOy_jfawtEBdv5Zr/exec";
 
         let dbOnline = [];
-        let selectedDate = new Date().toISOString().split('T')[0];
+        
+        // Logika Waktu Jakarta (Tetap Sinkron Biar Refresh Gak Hilang)
+        function getJakartaDate() {
+            return new Intl.DateTimeFormat('en-CA', { 
+                timeZone: 'Asia/Jakarta', 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit' 
+            }).format(new Date());
+        }
+
+        let selectedDate = getJakartaDate();
 
         async function fetchDataOnline() {
             try {
                 const response = await fetch(SCRIPT_URL);
                 dbOnline = await response.json();
+                loadDayData(); // Panggil otomatis setelah data didapat
             } catch (e) { console.error("Gagal load data"); }
         }
 
@@ -166,29 +178,49 @@
             document.querySelectorAll('.task-card.active').forEach(card => tasks.push(card.dataset.task));
             
             const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerText;
             btn.innerText = "MENGIRIM...";
             btn.disabled = true;
 
             try {
+                // Kirim data ke Google Sheets
                 await fetch(SCRIPT_URL, {
                     method: "POST",
-                    body: JSON.stringify({ nama: user, tugas: tasks, tanggal: selectedDate })
+                    body: JSON.stringify({ 
+                        nama: user, 
+                        tugas: tasks, 
+                        tanggal: selectedDate 
+                    })
                 });
-                alert('Berhasil Online! Data ' + user + ' tersimpan di grup.');
-                await fetchDataOnline();
-            } catch (e) { alert('Gagal kirim data.'); } 
-            finally { btn.innerText = "SIMPAN PROGRESS"; btn.disabled = false; }
+                
+                alert('Alhamdulillah! Data ' + user + ' tersimpan.');
+                await fetchDataOnline(); // Refresh data online agar grafik & centang sinkron
+            } catch (e) { 
+                alert('Gagal kirim data. Cek koneksi.'); 
+            } finally { 
+                btn.innerText = originalText; 
+                btn.disabled = false; 
+            }
         }
 
+        // FUNGSI UTAMA: Meload centang dari database biar gak hilang pas refresh
         function loadDayData() {
             const user = document.getElementById('userSelect').value;
-            const lastEntry = dbOnline.filter(d => d.nama === user && d.tanggal === selectedDate).pop();
+            
+            // Cari data terakhir milik user di tanggal hari ini
+            const lastEntry = dbOnline.filter(d => d.nama.trim() === user.trim() && d.tanggal === selectedDate).pop();
             const savedTasks = lastEntry ? lastEntry.tugas : [];
 
+            // Reset semua centang dulu sebelum meload yang baru
             document.querySelectorAll('.task-card').forEach(card => {
                 const isSelected = savedTasks.includes(card.dataset.task);
-                card.classList.toggle('active', isSelected);
-                card.querySelector('.box').innerHTML = isSelected ? '✔' : '';
+                if(isSelected) {
+                    card.classList.add('active');
+                    card.querySelector('.box').innerHTML = '✔';
+                } else {
+                    card.classList.remove('active');
+                    card.querySelector('.box').innerHTML = '';
+                }
             });
         }
 
@@ -197,7 +229,7 @@
             const ctx = document.getElementById('progressChart').getContext('2d');
             
             const dataPoin = names.map(name => {
-                const entry = dbOnline.filter(d => d.nama === name && d.tanggal === selectedDate).pop();
+                const entry = dbOnline.filter(d => d.nama.trim() === name.trim() && d.tanggal === selectedDate).pop();
                 return entry ? entry.tugas.length : 0;
             });
 
@@ -229,9 +261,11 @@
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
         window.onload = async () => {
-            document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            // Tampilan Tanggal Jakarta
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' };
+            document.getElementById('currentDateDisplay').innerText = new Intl.DateTimeFormat('id-ID', options).format(new Date());
+            
             await fetchDataOnline();
-            loadDayData();
         };
     </script>
 </body>
