@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro v10</title>
+    <title>Ramadan Tracker Pro v11 - Firebase Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; overflow-x: hidden; }
@@ -18,7 +20,7 @@
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         .page-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .page-box { aspect-ratio: 1; border: 1px solid #1e293b; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; transition: all 0.2s; }
+        .page-box { aspect-ratio: 1; border: 1px solid #1e293b; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; transition: all 0.2s; cursor: pointer; }
         .page-box.active { background-color: #10b981; border-color: #10b981; color: #020617; }
     </style>
 </head>
@@ -87,8 +89,7 @@
                     <span id="icon-folderTilawah" class="text-xs text-slate-500">▼</span>
                 </button>
                 <div id="folderTilawah" class="folder-content px-4 pb-4">
-                    <div class="page-grid" id="pageGridContainer">
-                        </div>
+                    <div class="page-grid" id="pageGridContainer"></div>
                 </div>
             </div>
 
@@ -125,37 +126,58 @@
             <audio id="bgMusic" loop></audio>
         </div>
     </div>
-
     <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[150] p-4 flex flex-col">
         <div class="flex justify-between items-center mb-6 pt-4 px-2"><h2 class="text-xl font-black italic tracking-tighter text-emerald-400">PROGRES GRUP</h2><button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-2xl font-bold border border-red-500/20">X</button></div>
         <div class="bg-slate-900 p-4 rounded-3xl flex-grow flex items-center shadow-inner overflow-hidden"><canvas id="progressChart"></canvas></div>
     </div>
 
     <script>
+        // 1. Firebase Config (Dari Hasil Copy-Paste Kamu)
+        const firebaseConfig = {
+            apiKey: "AIzaSyC21SVp8RL6O3aJtRJtVCelBgGCmsJpiu8",
+            authDomain: "ramdhan-tacker.firebaseapp.com",
+            databaseURL: "https://ramdhan-tacker-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ramdhan-tacker",
+            storageBucket: "ramdhan-tacker.firebasestorage.app",
+            messagingSenderId: "776108389920",
+            appId: "1:776108389920:web:da299960b00cdc09e5ee45"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // 2. Variables
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
         const chartColors = ['#10b981', '#60a5fa', '#a78bfa', '#fbbf24', '#f472b6', '#2dd4bf', '#fb7185'];
-        let db = JSON.parse(localStorage.getItem('ramadan_db_v8')) || {};
+        let db = {};
         
+        // 3. Jakarta Real-time Date
         function getJakartaDate() {
             return new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
         }
-
         let selectedDate = getJakartaDate();
 
-        // Render Hal 1-20
+        // 4. Initialization
         const grid = document.getElementById('pageGridContainer');
         for(let i=1; i<=20; i++) {
             const div = document.createElement('div');
-            div.className = 'page-box cursor-pointer';
+            div.className = 'page-box';
             div.innerText = i;
             div.dataset.task = 'page-' + i;
             div.onclick = function() { this.classList.toggle('active'); };
             grid.appendChild(div);
         }
 
+        // Listener Real-time Firebase
+        database.ref('ramadan_db_v8').on('value', (snapshot) => {
+            db = snapshot.val() || {};
+            loadDayData();
+        });
+
+        // 5. Functions
         function changeDate(newDate) {
             selectedDate = newDate;
-            document.getElementById('currentDateDisplay').innerText = new Date(newDate).toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById('currentDateDisplay').innerText = new Date(newDate).toLocaleDateString('id-ID', options);
             loadDayData();
         }
 
@@ -168,7 +190,8 @@
 
         function toggleTask(el) {
             el.classList.toggle('active');
-            el.querySelector('.box').innerHTML = el.classList.contains('active') ? '✔' : '';
+            const box = el.querySelector('.box');
+            if(box) box.innerHTML = el.classList.contains('active') ? '✔' : '';
         }
 
         function playTrack(url, title) {
@@ -189,10 +212,10 @@
             const user = document.getElementById('userSelect').value;
             const tasks = [];
             document.querySelectorAll('.task-card.active, .page-box.active').forEach(el => tasks.push(el.dataset.task));
-            if(!db[user]) db[user] = {};
-            db[user][selectedDate] = tasks;
-            localStorage.setItem('ramadan_db_v8', JSON.stringify(db));
-            alert(`Alhamdulillah! Progres ${user} tersimpan.`);
+            
+            database.ref('ramadan_db_v8/' + user + '/' + selectedDate).set(tasks)
+            .then(() => alert(`Alhamdulillah! Progres ${user} tersimpan.`))
+            .catch((err) => alert("Error: " + err.message));
         }
 
         function loadDayData() {
@@ -215,13 +238,12 @@
                 type: 'bar',
                 data: { labels: names, datasets: [{ data: dataPoin, backgroundColor: chartColors, borderRadius: 12, barThickness: 25 }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-                    scales: { x: { beginAtZero: true, max: 35, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
+                    scales: { x: { beginAtZero: true, max: 40, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
                               y: { grid: { display: false }, ticks: { color: 'white', font: { weight: 'bold' } } } },
                     plugins: { legend: { display: false } }
                 }
             });
         }
-
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
         window.onload = () => {
