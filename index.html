@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro v13 - Auto Reset WIB</title>
+    <title>Ramadan Tracker Pro v14 - Total Accumulation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -132,6 +132,7 @@
     </div>
 
     <script>
+        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyC21SVp8RL6O3aJtRJtVCelBgGCmsJpiu8",
             authDomain: "ramdhan-tacker.firebaseapp.com",
@@ -144,28 +145,28 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // 2. Variables
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
         const chartColors = ['#10b981', '#60a5fa', '#a78bfa', '#fbbf24', '#f472b6', '#2dd4bf', '#fb7185'];
         let db = {};
         
+        // 3. Jakarta Real-time Date
         function getJakartaDate() {
             return new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
         }
         let selectedDate = getJakartaDate();
 
-        // LOGIKA AUTO-RESET JAM 00:00 WIB
-        function checkAutoReset() {
-            const nowJakarta = getJakartaDate();
-            if (nowJakarta !== selectedDate) {
-                console.log("Tengah malam terdeteksi! Reset ke hari baru...");
-                selectedDate = nowJakarta;
-                document.getElementById('datePicker').value = nowJakarta;
-                changeDate(nowJakarta);
+        // Auto-reset jam 00:00 WIB
+        setInterval(() => {
+            const now = getJakartaDate();
+            if (now !== selectedDate) {
+                selectedDate = now;
+                document.getElementById('datePicker').value = now;
+                changeDate(now);
             }
-        }
-        // Cek setiap 1 menit agar presisi
-        setInterval(checkAutoReset, 60000);
+        }, 60000);
 
+        // 4. Initialization
         const grid = document.getElementById('pageGridContainer');
         for(let i=1; i<=20; i++) {
             const div = document.createElement('div');
@@ -176,11 +177,13 @@
             grid.appendChild(div);
         }
 
+        // Listener Real-time Firebase folder v12 (Nama Lengkap)
         database.ref('ramadan_db_v12').on('value', (snapshot) => {
             db = snapshot.val() || {};
             loadDayData();
         });
 
+        // 5. Functions
         function changeDate(newDate) {
             selectedDate = newDate;
             document.getElementById('currentDateDisplay').innerText = new Date(newDate).toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
@@ -233,18 +236,29 @@
             });
         }
 
+        // FUNGSI AKUMULASI TOTAL POIN (SEMUA HARI)
         function openChart() {
             document.getElementById('chartModal').style.display = 'flex';
             const ctx = document.getElementById('progressChart').getContext('2d');
-            const dataPoin = names.map(name => (db[name] && db[name][selectedDate]) ? db[name][selectedDate].length : 0);
+            
+            const dataTotalKumulatif = names.map(name => {
+                let total = 0;
+                if (db[name]) {
+                    Object.keys(db[name]).forEach(tgl => {
+                        total += db[name][tgl].length; // Menjumlahkan semua centang dari semua tanggal
+                    });
+                }
+                return total;
+            });
+
             if(window.myChart) window.myChart.destroy();
             window.myChart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: names, datasets: [{ data: dataPoin, backgroundColor: chartColors, borderRadius: 12, barThickness: 25 }] },
+                data: { labels: names, datasets: [{ label: 'Total Poin Kumulatif', data: dataTotalKumulatif, backgroundColor: chartColors, borderRadius: 12, barThickness: 25 }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-                    scales: { x: { beginAtZero: true, max: 40, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
+                    scales: { x: { beginAtZero: true, suggestedMax: 100, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
                               y: { grid: { display: false }, ticks: { color: 'white', font: { weight: 'bold' } } } },
-                    plugins: { legend: { display: false } }
+                    plugins: { legend: { display: true, labels: { color: '#10b981' } } }
                 }
             });
         }
