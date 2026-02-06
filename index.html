@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro v8</title>
+    <title>Ramadan Tracker Pro v9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -15,6 +15,11 @@
         .folder-content.open { display: block; }
         #sidebar, #chartModal { display: none; }
         .sidebar-open { display: block !important; animation: slideIn 0.3s forwards; }
+        /* Styling khusus agar input date terlihat bagus di dark mode */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
@@ -24,7 +29,10 @@
         <header class="flex justify-between items-center py-8">
             <div>
                 <h1 class="text-2xl font-extrabold text-emerald-400 italic uppercase tracking-tighter">RAMADAN <span class="text-white font-normal">TRACKER</span></h1>
-                <p id="currentDateDisplay" class="text-slate-400 text-[10px] font-bold tracking-widest uppercase mt-1 italic"></p>
+                <div class="mt-2 flex items-center space-x-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
+                    <span class="text-xs">📅</span>
+                    <input type="date" id="datePicker" onchange="changeDate(this.value)" class="bg-transparent text-[11px] font-bold text-emerald-400 outline-none uppercase cursor-pointer">
+                </div>
             </div>
             <div class="flex items-center space-x-2">
                 <button onclick="openChart()" class="bg-slate-900 p-2 rounded-xl border border-slate-800 text-lg">📊</button>
@@ -54,7 +62,7 @@
 
         <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-6 shadow-xl">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Anggota</label>
-            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 appearance-none">
                 <option value="Arif">Arif</option>
                 <option value="Heru">Heru</option>
                 <option value="Fajar">Fajar</option>
@@ -85,22 +93,10 @@
                 </div>
             </div>
 
-            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg">
-                <button onclick="toggleFolder('folderSunnah')" class="w-full p-5 flex justify-between items-center bg-slate-900">
-                    <span class="font-black text-[10px] tracking-widest text-yellow-500 uppercase italic">Sholat Sunnah Nawafil</span>
-                    <span id="icon-folderSunnah" class="text-xs">▼</span>
-                </button>
-                <div id="folderSunnah" class="folder-content p-4 space-y-2 bg-slate-950/50">
-                    <div onclick="toggleTask(this)" data-task="dhuha" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Dhuha</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="tahajud" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Tahajud</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="witir" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 font-bold italic"><span class="text-sm">Witir</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                </div>
-            </div>
-
             <div class="space-y-3 pt-2">
                 <div onclick="toggleTask(this)" data-task="tilawah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic">Tilawah Qur'an <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
                 <div onclick="toggleTask(this)" data-task="buku" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic">Baca Buku <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
-                <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400">Sedekah Shubuh <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-white"></div></div>
+                <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400">Sedekah <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-white"></div></div>
                 <div onclick="toggleTask(this)" data-task="riyadho" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-rose-400">Riyadho <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center text-white"></div></div>
             </div>
         </div>
@@ -110,21 +106,38 @@
 
     <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[80] p-4 flex flex-col">
         <div class="flex justify-between items-center mb-6 pt-4 px-2">
-            <h2 class="text-xl font-black italic tracking-tighter text-emerald-400">PROGRES GRUP</h2>
+            <h2 class="text-xl font-black italic tracking-tighter text-emerald-400 uppercase">PROGRES GRUP</h2>
             <button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-2xl font-bold border border-red-500/20">X</button>
         </div>
         <div class="bg-slate-900 p-4 rounded-3xl flex-grow flex items-center shadow-inner overflow-hidden">
             <canvas id="progressChart"></canvas>
         </div>
-        <p class="text-center text-slate-500 text-[9px] font-bold mt-4 tracking-widest uppercase italic italic">Akumulasi Amalan Hari Ini</p>
+        <p class="text-center text-slate-500 text-[9px] font-bold mt-4 tracking-widest uppercase italic">Akumulasi Amalan Per Tanggal</p>
     </div>
 
     <script>
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
         const chartColors = ['#10b981', '#60a5fa', '#a78bfa', '#fbbf24', '#f472b6', '#2dd4bf', '#fb7185'];
         
-        let db = JSON.parse(localStorage.getItem('ramadan_db_v8')) || {};
-        let selectedDate = new Date().toISOString().split('T')[0];
+        let db = JSON.parse(localStorage.getItem('ramadan_db_v9')) || {};
+
+        // 1. KUNCI WAKTU JAKARTA
+        function getJakartaDate() {
+            return new Intl.DateTimeFormat('en-CA', { 
+                timeZone: 'Asia/Jakarta', 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit' 
+            }).format(new Date());
+        }
+
+        let selectedDate = getJakartaDate();
+
+        // 2. FUNGSI GANTI TANGGAL KALENDER
+        function changeDate(newDate) {
+            selectedDate = newDate;
+            loadDayData();
+        }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-open'); }
         
@@ -162,8 +175,8 @@
             document.querySelectorAll('.task-card.active').forEach(card => tasks.push(card.dataset.task));
             if(!db[user]) db[user] = {};
             db[user][selectedDate] = tasks;
-            localStorage.setItem('ramadan_db_v8', JSON.stringify(db));
-            alert('Sukses! Progres ' + user + ' Hari Ini Tersimpan.');
+            localStorage.setItem('ramadan_db_v9', JSON.stringify(db));
+            alert('Sukses! Progres ' + user + ' tgl ' + selectedDate + ' tersimpan.');
         }
 
         function loadDayData() {
@@ -211,8 +224,8 @@
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
         window.onload = () => {
-            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('id-ID', options);
+            // Set input kalender ke tanggal Jakarta saat ini
+            document.getElementById('datePicker').value = selectedDate;
             loadDayData();
         };
     </script>
