@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro v14 - Total Accumulation</title>
+    <title>Ramadan Tracker Pro v15 - Leaderboard Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -126,13 +126,13 @@
             <audio id="bgMusic" loop></audio>
         </div>
     </div>
-    <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[150] p-4 flex flex-col">
+    <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[150] p-4 flex flex-col overflow-y-auto">
         <div class="flex justify-between items-center mb-6 pt-4 px-2"><h2 class="text-xl font-black italic tracking-tighter text-emerald-400">PROGRES GRUP</h2><button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-2xl font-bold border border-red-500/20">X</button></div>
-        <div class="bg-slate-900 p-4 rounded-3xl flex-grow flex items-center shadow-inner overflow-hidden"><canvas id="progressChart"></canvas></div>
+        <div class="bg-slate-900 p-4 rounded-3xl min-h-[300px] flex items-center shadow-inner overflow-hidden"><canvas id="progressChart"></canvas></div>
+        <div id="rankTableContainer"></div>
     </div>
 
     <script>
-        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyC21SVp8RL6O3aJtRJtVCelBgGCmsJpiu8",
             authDomain: "ramdhan-tacker.firebaseapp.com",
@@ -145,18 +145,15 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // 2. Variables
         const names = ["Arif", "Heru", "Fajar", "Faisal", "Mulyadi", "Yudi", "Kang Deny"];
         const chartColors = ['#10b981', '#60a5fa', '#a78bfa', '#fbbf24', '#f472b6', '#2dd4bf', '#fb7185'];
         let db = {};
         
-        // 3. Jakarta Real-time Date
         function getJakartaDate() {
             return new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
         }
         let selectedDate = getJakartaDate();
 
-        // Auto-reset jam 00:00 WIB
         setInterval(() => {
             const now = getJakartaDate();
             if (now !== selectedDate) {
@@ -166,7 +163,6 @@
             }
         }, 60000);
 
-        // 4. Initialization
         const grid = document.getElementById('pageGridContainer');
         for(let i=1; i<=20; i++) {
             const div = document.createElement('div');
@@ -177,13 +173,11 @@
             grid.appendChild(div);
         }
 
-        // Listener Real-time Firebase folder v12 (Nama Lengkap)
         database.ref('ramadan_db_v12').on('value', (snapshot) => {
             db = snapshot.val() || {};
             loadDayData();
         });
 
-        // 5. Functions
         function changeDate(newDate) {
             selectedDate = newDate;
             document.getElementById('currentDateDisplay').innerText = new Date(newDate).toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
@@ -236,32 +230,74 @@
             });
         }
 
-        // FUNGSI AKUMULASI TOTAL POIN (SEMUA HARI)
         function openChart() {
             document.getElementById('chartModal').style.display = 'flex';
             const ctx = document.getElementById('progressChart').getContext('2d');
             
-            const dataTotalKumulatif = names.map(name => {
+            let rankData = names.map(name => {
                 let total = 0;
                 if (db[name]) {
                     Object.keys(db[name]).forEach(tgl => {
-                        total += db[name][tgl].length; // Menjumlahkan semua centang dari semua tanggal
+                        total += db[name][tgl].length;
                     });
                 }
-                return total;
+                return { name: name, score: total };
             });
+
+            rankData.sort((a, b) => b.score - a.score);
+            const sortedLabels = rankData.map(d => d.name);
+            const sortedScores = rankData.map(d => d.score);
 
             if(window.myChart) window.myChart.destroy();
             window.myChart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: names, datasets: [{ label: 'Total Poin Kumulatif', data: dataTotalKumulatif, backgroundColor: chartColors, borderRadius: 12, barThickness: 25 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-                    scales: { x: { beginAtZero: true, suggestedMax: 100, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
-                              y: { grid: { display: false }, ticks: { color: 'white', font: { weight: 'bold' } } } },
-                    plugins: { legend: { display: true, labels: { color: '#10b981' } } }
+                data: { 
+                    labels: sortedLabels, 
+                    datasets: [{ 
+                        label: 'Total Poin Kumulatif', 
+                        data: sortedScores, 
+                        backgroundColor: chartColors, 
+                        borderRadius: 12, 
+                        barThickness: 20 
+                    }] 
+                },
+                options: { 
+                    indexAxis: 'y', 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    scales: { 
+                        x: { beginAtZero: true, suggestedMax: 100, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
+                        y: { grid: { display: false }, ticks: { color: 'white', font: { weight: 'bold' } } } 
+                    },
+                    plugins: { legend: { display: false } }
                 }
             });
+
+            // Generate Tabel
+            let tableHTML = `<div id="rankTable" class="mt-6 w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/50">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-800 text-emerald-400 uppercase font-black italic">
+                        <tr>
+                            <th class="p-3">Rank</th>
+                            <th class="p-3">Nama</th>
+                            <th class="p-3 text-right">Poin</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">`;
+
+            rankData.forEach((player, index) => {
+                let trophy = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : `<span class="text-slate-500">${index + 1}</span>`;
+                tableHTML += `
+                    <tr class="${index === 0 ? 'bg-emerald-500/10' : ''}">
+                        <td class="p-3 text-lg">${trophy}</td>
+                        <td class="p-3 font-bold ${index === 0 ? 'text-emerald-400' : 'text-white'}">${player.name}</td>
+                        <td class="p-3 text-right font-black text-emerald-500">${player.score}</td>
+                    </tr>`;
+            });
+            tableHTML += `</tbody></table></div>`;
+            document.getElementById('rankTableContainer').innerHTML = tableHTML;
         }
+
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
         window.onload = () => {
