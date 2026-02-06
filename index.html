@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro - Final Fix v14</title>
+    <title>Ramadan Tracker Pro - Final Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -42,7 +42,7 @@
 
         <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-6 shadow-xl">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Profil Anggota</label>
-            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 appearance-none shadow-inner">
+            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner">
                 <option value="Arif">Arif</option>
                 <option value="Heru">Heru</option>
                 <option value="Fajar">Fajar</option>
@@ -55,35 +55,22 @@
 
         <div class="space-y-4">
             <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg">
-                <button onclick="toggleFolder('folderSholat')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
+                <button onclick="toggleFolder('folderSholat')" class="w-full p-5 flex justify-between items-center bg-slate-900">
                     <span class="font-black text-[10px] tracking-widest text-emerald-400 uppercase italic">Sholat Berjamaah + Rawatib</span>
                     <span id="icon-folderSholat" class="text-xs">▼</span>
                 </button>
                 <div id="folderSholat" class="folder-content p-4 space-y-2 bg-slate-950/50">
-                    <div onclick="toggleTask(this)" data-task="js" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="qs" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic opacity-50"><span class="text-sm">Qobliyah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="jd" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="qd" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic opacity-50"><span class="text-sm">Qobliyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="ja" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Ashar</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="jm" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="ji" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
+                    <div onclick="toggleTask(this)" data-task="js" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="qs" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic opacity-50"><span class="text-sm">Qobliyah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="jd" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="ja" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Ashar</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="jm" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
+                    <div onclick="toggleTask(this)" data-task="ji" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center"></div></div>
                 </div>
             </div>
 
-            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg text-yellow-500">
-                <button onclick="toggleFolder('folderSunnah')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
-                    <span class="font-black text-[10px] tracking-widest uppercase italic font-bold">Sholat Sunnah Nawafil</span>
-                    <span id="icon-folderSunnah" class="text-xs">▼</span>
-                </button>
-                <div id="folderSunnah" class="folder-content p-4 space-y-2 bg-slate-950/50">
-                    <div onclick="toggleTask(this)" data-task="dhuha" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Dhuha</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="tahajud" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Tahajud</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="witir" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Witir</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                </div>
-            </div>
-
-            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg text-white">
-                <button onclick="toggleFolder('folderTilawah')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
+            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg">
+                <button onclick="toggleFolder('folderTilawah')" class="w-full p-5 flex justify-between items-center bg-slate-900">
                     <span class="font-black text-[10px] tracking-widest uppercase italic font-bold">Tilawah Qur'an (Halaman)</span>
                     <span id="icon-folderTilawah" class="text-xs">▼</span>
                 </button>
@@ -99,15 +86,14 @@
             </div>
 
             <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400">Sedekah Shubuh <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
-            <div onclick="toggleTask(this)" data-task="riyadho" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-rose-400">Riyadho <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
         </div>
 
-        <button onclick="saveCurrentDay()" id="saveBtn" class="w-full mt-10 bg-gradient-to-br from-emerald-600 to-teal-800 text-white font-black py-5 rounded-3xl shadow-xl uppercase tracking-widest italic active:scale-95 transition shadow-emerald-900/20">SIMPAN PROGRESS</button>
+        <button onclick="saveCurrentDay()" id="saveBtn" class="w-full mt-10 bg-gradient-to-br from-emerald-600 to-teal-800 text-white font-black py-5 rounded-3xl shadow-xl uppercase tracking-widest italic active:scale-95 transition">SIMPAN PROGRESS</button>
     </div>
 
     <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[80] p-4 flex flex-col">
         <div class="flex justify-between items-center mb-6 pt-4 px-2">
-            <h2 class="text-xl font-black italic tracking-tighter text-emerald-400 uppercase">Progres Grup (Online)</h2>
+            <h2 class="text-xl font-black italic tracking-tighter text-emerald-400 uppercase">Progres Grup</h2>
             <button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-2xl font-bold border border-red-500/20 text-center flex items-center justify-center">X</button>
         </div>
         <div class="bg-slate-900 p-4 rounded-3xl flex-grow flex items-center shadow-inner overflow-hidden mb-4">
@@ -116,22 +102,6 @@
         <div class="bg-slate-900/80 p-5 rounded-3xl border border-slate-800">
             <h3 class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 italic">Live Status Update</h3>
             <div id="statusFeed" class="text-xs font-bold text-emerald-400 italic space-y-1">Menunggu update...</div>
-        </div>
-    </div>
-
-    <div id="sidebar" class="fixed inset-y-0 right-0 w-72 bg-slate-950 border-l border-slate-800 z-[70] p-6 shadow-2xl overflow-y-auto">
-        <div class="flex justify-between items-center mb-8">
-            <h3 class="font-black text-emerald-400 italic uppercase tracking-widest text-sm">Playlist Musik</h3>
-            <button onclick="toggleSidebar()" class="text-slate-500 font-bold">✕</button>
-        </div>
-        <div class="space-y-2">
-            <button onclick="playTrack('music/asmaun-nabi.mp3', 'Asmaun Nabi')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold hover:bg-slate-800 transition italic">🎵 Asmaun Nabi</button>
-            <button onclick="playTrack('music/lagu-kesayangan-arif.mp3', 'Lagu Arif')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold hover:bg-slate-800 transition italic">🎵 Lagu Arif</button>
-        </div>
-        <div class="mt-8 p-4 bg-slate-900 rounded-2xl border border-slate-800 text-center">
-            <p id="trackTitle" class="text-[9px] font-black text-emerald-500 mb-3 uppercase tracking-widest italic">Pilih Lagu</p>
-            <button id="playBtn" onclick="toggleMusic()" class="bg-emerald-500 text-slate-950 w-12 h-12 rounded-full mx-auto flex items-center justify-center font-bold text-xl">▶</button>
-            <audio id="bgMusic" loop></audio>
         </div>
     </div>
 
@@ -159,14 +129,6 @@
             loadDayData();
         }
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-open'); }
-        function toggleFolder(id) {
-            const content = document.getElementById(id);
-            const icon = document.getElementById('icon-' + id);
-            content.classList.toggle('open');
-            icon.innerText = content.classList.contains('open') ? '▲' : '▼';
-        }
-
         function toggleTask(el) {
             el.classList.toggle('active');
             el.querySelector('.box').innerHTML = el.classList.contains('active') ? '✔' : '';
@@ -188,9 +150,9 @@
                     method: "POST",
                     body: JSON.stringify({ nama: user, tugas: tasks, tanggal: selectedDate })
                 });
-                alert(`Alhamdulillah! Data ${user} untuk tanggal ${selectedDate} berhasil tersimpan.`);
+                alert(`Alhamdulillah! Data ${user} tersimpan.`);
                 await fetchDataOnline(); 
-            } catch (e) { alert('Gagal kirim data. Cek koneksi internet.'); } 
+            } catch (e) { alert('Gagal! Klik "Advanced" & "Allow" pada peringatan Google.'); } 
             finally { btn.innerText = "SIMPAN PROGRESS"; btn.disabled = false; }
         }
 
@@ -239,7 +201,7 @@
                 options: {
                     indexAxis: 'y', responsive: true, maintainAspectRatio: false,
                     scales: {
-                        x: { beginAtZero: true, max: 35, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
+                        x: { beginAtZero: true, max: 25, grid: { color: '#1e293b' } },
                         y: { grid: { display: false }, ticks: { color: 'white', font: { weight: 'bold' } } }
                     },
                     plugins: { legend: { display: false } }
@@ -249,16 +211,11 @@
         }
 
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
-        function playTrack(url, title) {
-            const audio = document.getElementById('bgMusic'); audio.src = url;
-            document.getElementById('trackTitle').innerText = title;
-            audio.play(); document.getElementById('playBtn').innerText = '⏸';
-        }
-
-        function toggleMusic() {
-            const audio = document.getElementById('bgMusic');
-            if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
-            else { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
+        function toggleFolder(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            content.classList.toggle('open');
+            icon.innerText = content.classList.contains('open') ? '▲' : '▼';
         }
 
         window.onload = async () => { await fetchDataOnline(); };
