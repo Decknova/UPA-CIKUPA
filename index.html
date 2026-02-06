@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramadan Tracker Pro - Final Online</title>
+    <title>Ramadan Tracker Pro - Live v13</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -17,6 +17,8 @@
         .sidebar-open { display: block !important; animation: slideIn 0.3s forwards; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        .status-dot { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen pb-20">
@@ -31,7 +33,9 @@
                 </div>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="openChart()" class="bg-slate-900 p-2 rounded-xl border border-slate-800 text-lg">📊</button>
+                <button onclick="openChart()" class="bg-slate-900 p-2 rounded-xl border border-slate-800 text-lg relative">
+                    📊 <span class="status-dot absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full"></span>
+                </button>
                 <button onclick="toggleSidebar()" class="bg-emerald-500 text-slate-950 p-2 rounded-xl">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16" />
@@ -40,14 +44,14 @@
             </div>
         </header>
 
-        <div id="sidebar" class="fixed inset-y-0 right-0 w-72 bg-slate-950 border-l border-slate-800 z-[70] p-6 shadow-2xl overflow-y-auto">
+        <div id="sidebar" class="fixed inset-y-0 right-0 w-72 bg-slate-950 border-l border-slate-800 z-[70] p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-8">
                 <h3 class="font-black text-emerald-400 italic uppercase tracking-widest text-sm">Playlist</h3>
                 <button onclick="toggleSidebar()" class="text-slate-500 font-bold">✕</button>
             </div>
             <div class="space-y-2">
-                <button onclick="playTrack('music/asmaun-nabi.mp3', 'Asmaun Nabi')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold hover:bg-slate-800 transition italic">🎵 Asmaun Nabi</button>
-                <button onclick="playTrack('music/lagu-kesayangan-arif.mp3', 'Lagu Arif')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold hover:bg-slate-800 transition italic">🎵 Lagu Arif</button>
+                <button onclick="playTrack('music/asmaun-nabi.mp3', 'Asmaun Nabi')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold italic">🎵 Asmaun Nabi</button>
+                <button onclick="playTrack('music/lagu-kesayangan-arif.mp3', 'Lagu Arif')" class="w-full text-left p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold italic">🎵 Lagu Arif</button>
             </div>
             <div class="mt-8 p-4 bg-slate-900 rounded-2xl border border-slate-800 text-center">
                 <p id="trackTitle" class="text-[9px] font-black text-emerald-500 mb-3 uppercase tracking-widest italic">Pilih Lagu</p>
@@ -58,7 +62,7 @@
 
         <div class="bg-slate-900/50 border border-slate-800 p-5 rounded-3xl mb-6 shadow-xl">
             <label class="block mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">Profil Anggota</label>
-            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 appearance-none shadow-inner">
+            <select id="userSelect" onchange="loadDayData()" class="w-full bg-slate-800 border-none p-4 rounded-2xl text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner">
                 <option value="Arif">Arif</option>
                 <option value="Heru">Heru</option>
                 <option value="Fajar">Fajar</option>
@@ -71,7 +75,7 @@
 
         <div class="space-y-4">
             <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg">
-                <button onclick="toggleFolder('folderSholat')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
+                <button onclick="toggleFolder('folderSholat')" class="w-full p-5 flex justify-between items-center bg-slate-900">
                     <span class="font-black text-[10px] tracking-widest text-emerald-400 uppercase italic">Sholat Berjamaah + Rawatib</span>
                     <span id="icon-folderSholat" class="text-xs">▼</span>
                 </button>
@@ -79,18 +83,14 @@
                     <div onclick="toggleTask(this)" data-task="js" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                     <div onclick="toggleTask(this)" data-task="qs" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic opacity-50"><span class="text-sm">Qobliyah Shubuh</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                     <div onclick="toggleTask(this)" data-task="jd" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="qd" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic opacity-50"><span class="text-sm">Qobliyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="bd" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic opacity-50"><span class="text-sm">Ba'diyah Dzuhur</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                     <div onclick="toggleTask(this)" data-task="ja" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Ashar</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                     <div onclick="toggleTask(this)" data-task="jm" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="bm" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic opacity-50"><span class="text-sm">Ba'diyah Maghrib</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                     <div onclick="toggleTask(this)" data-task="ji" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic font-bold"><span class="text-sm">Jamaah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
-                    <div onclick="toggleTask(this)" data-task="bi" class="task-card bg-slate-900 p-4 rounded-xl flex justify-between items-center border border-slate-800 italic opacity-50"><span class="text-sm">Ba'diyah Isya</span><div class="box w-5 h-5 border-2 border-slate-700 rounded flex items-center justify-center text-[10px]"></div></div>
                 </div>
             </div>
 
             <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg text-yellow-500">
-                <button onclick="toggleFolder('folderSunnah')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
+                <button onclick="toggleFolder('folderSunnah')" class="w-full p-5 flex justify-between items-center bg-slate-900">
                     <span class="font-black text-[10px] tracking-widest uppercase italic">Sholat Sunnah Nawafil</span>
                     <span id="icon-folderSunnah" class="text-xs">▼</span>
                 </button>
@@ -101,13 +101,13 @@
                 </div>
             </div>
 
-            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg text-white">
-                <button onclick="toggleFolder('folderTilawah')" class="w-full p-5 flex justify-between items-center bg-slate-900 hover:bg-slate-800 transition">
+            <div class="bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden shadow-lg">
+                <button onclick="toggleFolder('folderTilawah')" class="w-full p-5 flex justify-between items-center bg-slate-900">
                     <span class="font-black text-[10px] tracking-widest uppercase italic font-bold">Tilawah Qur'an (Halaman)</span>
                     <span id="icon-folderTilawah" class="text-xs">▼</span>
                 </button>
                 <div id="folderTilawah" class="folder-content p-5 bg-slate-950/50">
-                    <div class="grid grid-cols-5 gap-3" id="tilawahGrid">
+                    <div class="grid grid-cols-5 gap-3">
                         <script>
                             for(let i=1; i<=20; i++) {
                                 document.write(`<div onclick="togglePage(this)" data-page="${i}" class="page-box aspect-square flex items-center justify-center border border-slate-800 rounded-xl text-xs font-bold cursor-pointer transition shadow-inner">${i}</div>`);
@@ -117,20 +117,28 @@
                 </div>
             </div>
 
-            <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400">Sedekah Shubuh <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
-            <div onclick="toggleTask(this)" data-task="riyadho" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-rose-400">Riyadho <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg flex items-center justify-center"></div></div>
+            <div onclick="toggleTask(this)" data-task="sedekah" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-emerald-400">Sedekah Shubuh <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg"></div></div>
+            <div onclick="toggleTask(this)" data-task="riyadho" class="task-card bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 font-bold italic text-rose-400">Riyadho <div class="box w-6 h-6 border-2 border-slate-700 rounded-lg"></div></div>
         </div>
 
-        <button onclick="saveCurrentDay()" id="saveBtn" class="w-full mt-10 bg-gradient-to-br from-emerald-600 to-teal-800 text-white font-black py-5 rounded-3xl shadow-xl uppercase tracking-widest italic active:scale-95 transition shadow-emerald-900/20">SIMPAN PROGRESS</button>
+        <button onclick="saveCurrentDay()" id="saveBtn" class="w-full mt-10 bg-gradient-to-br from-emerald-600 to-teal-800 text-white font-black py-5 rounded-3xl shadow-xl uppercase tracking-widest italic active:scale-95 transition">SIMPAN PROGRESS</button>
     </div>
 
     <div id="chartModal" class="fixed inset-0 bg-slate-950/98 z-[80] p-4 flex flex-col">
         <div class="flex justify-between items-center mb-6 pt-4 px-2">
-            <h2 class="text-xl font-black italic tracking-tighter text-emerald-400 uppercase">Progres Grup (Online)</h2>
-            <button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-2xl font-bold border border-red-500/20 text-center flex items-center justify-center">X</button>
+            <h2 class="text-xl font-black italic tracking-tighter text-emerald-400 uppercase">Progres Grup</h2>
+            <button onclick="closeChart()" class="bg-red-500/20 text-red-500 w-10 h-10 rounded-2xl font-bold border border-red-500/20">X</button>
         </div>
-        <div class="bg-slate-900 p-4 rounded-3xl flex-grow flex items-center shadow-inner overflow-hidden">
+        
+        <div class="bg-slate-900 p-4 rounded-3xl flex-grow flex items-center shadow-inner overflow-hidden mb-4">
             <canvas id="progressChart"></canvas>
+        </div>
+
+        <div class="bg-slate-900/80 p-5 rounded-3xl border border-slate-800">
+            <h3 class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 italic">Live Status Update</h3>
+            <div id="statusFeed" class="text-xs font-bold text-emerald-400 italic space-y-1">
+                Menunggu update terbaru...
+            </div>
         </div>
     </div>
 
@@ -140,22 +148,22 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkaPve8ZmDaia6ffK05Akrp12N8g7MwIsagZMCXC1fzIXoDzgFjOy_jfawtEBdv5Zr/exec";
 
         let dbOnline = [];
-        let selectedDate = new Date().toISOString().split('T')[0];
+        let selectedDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 
-        // Setel tanggal kalender ke hari ini
         document.getElementById('datePicker').value = selectedDate;
 
         async function fetchDataOnline() {
             try {
                 const response = await fetch(SCRIPT_URL);
                 dbOnline = await response.json();
-                loadDayData(); // Isi centang di layar setelah data dimuat
-            } catch (e) { console.error("Gagal sinkron data online"); }
+                loadDayData();
+                updateStatusFeed();
+            } catch (e) { console.error("Gagal sinkron data"); }
         }
 
         function changeDate(newDate) {
             selectedDate = newDate;
-            loadDayData(); // Muat ulang centang saat tanggal kalender diganti
+            loadDayData();
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-open'); }
@@ -176,66 +184,56 @@
         async function saveCurrentDay() {
             const user = document.getElementById('userSelect').value;
             const tasks = [];
-            // Ambil tugas centang biasa
             document.querySelectorAll('.task-card.active').forEach(card => tasks.push(card.dataset.task));
-            // Ambil halaman tilawah
             document.querySelectorAll('.page-box.active').forEach(box => tasks.push('pg-' + box.dataset.page));
             
             const btn = document.getElementById('saveBtn');
-            btn.innerText = "MENGIRIM...";
-            btn.disabled = true;
+            btn.innerText = "MENGIRIM..."; btn.disabled = true;
 
             try {
                 await fetch(SCRIPT_URL, {
                     method: "POST",
                     body: JSON.stringify({ nama: user, tugas: tasks, tanggal: selectedDate })
                 });
-                alert(`Alhamdulillah! Data ${user} tanggal ${selectedDate} tersimpan.`);
-                await fetchDataOnline(); // Ambil data terbaru agar centang tidak hilang
+                alert(`Alhamdulillah! Progres ${user} tersimpan.`);
+                await fetchDataOnline(); // Ambil data terbaru agar centang & grafik update
             } catch (e) { alert('Gagal kirim data.'); } 
             finally { btn.innerText = "SIMPAN PROGRESS"; btn.disabled = false; }
         }
 
         function loadDayData() {
             const user = document.getElementById('userSelect').value;
-            // Cari data paling baru untuk user tersebut pada tanggal yang dipilih
             const userHistory = dbOnline.filter(d => d.nama.trim() === user.trim() && d.tanggal === selectedDate);
             const savedTasks = userHistory.length > 0 ? userHistory[userHistory.length - 1].tugas : [];
 
-            // Isi centang tugas utama
             document.querySelectorAll('.task-card').forEach(card => {
                 const isSelected = savedTasks.includes(card.dataset.task);
                 card.classList.toggle('active', isSelected);
                 card.querySelector('.box').innerHTML = isSelected ? '✔' : '';
             });
 
-            // Isi centang halaman tilawah
             document.querySelectorAll('.page-box').forEach(box => {
                 const isPageSelected = savedTasks.includes('pg-' + box.dataset.page);
                 box.classList.toggle('active', isPageSelected);
             });
         }
 
-        function playTrack(url, title) {
-            const audio = document.getElementById('bgMusic');
-            audio.src = url;
-            document.getElementById('trackTitle').innerText = title;
-            audio.play();
-            document.getElementById('playBtn').innerText = '⏸';
-        }
-
-        function toggleMusic() {
-            const audio = document.getElementById('bgMusic');
-            if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
-            else { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
+        // FUNGSI NOTIFIKASI LIVE FEED
+        function updateStatusFeed() {
+            const feed = document.getElementById('statusFeed');
+            const latest = dbOnline.filter(d => d.tanggal === selectedDate).slice(-3).reverse();
+            
+            if (latest.length > 0) {
+                feed.innerHTML = latest.map(d => `<div>🟢 <span class="text-white">${d.nama}</span> baru saja update!</div>`).join('');
+            } else {
+                feed.innerText = "Belum ada progres hari ini.";
+            }
         }
 
         function openChart() {
             document.getElementById('chartModal').style.display = 'flex';
             const ctx = document.getElementById('progressChart').getContext('2d');
-            
             const dataPoin = names.map(name => {
-                // Ambil skor terbaru anggota sesuai tanggal yang dipilih di kalender
                 const entry = dbOnline.filter(d => d.nama.trim() === name.trim() && d.tanggal === selectedDate).pop();
                 return entry ? entry.tugas.length : 0;
             });
@@ -246,31 +244,36 @@
                 data: {
                     labels: names,
                     datasets: [{
-                        data: dataPoin,
-                        backgroundColor: chartColors,
-                        borderRadius: 12,
-                        barThickness: 25
+                        data: dataPoin, backgroundColor: chartColors, borderRadius: 12, barThickness: 25
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // Nama di samping agar rapi di HP
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
                     scales: {
-                        x: { beginAtZero: true, max: 35, grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
-                        y: { grid: { display: false }, ticks: { color: 'white', font: { weight: 'bold', size: 12 } } }
+                        x: { beginAtZero: true, max: 35, grid: { color: '#1e293b' } },
+                        y: { grid: { display: false }, ticks: { color: 'white', font: { weight: 'bold' } } }
                     },
                     plugins: { legend: { display: false } }
                 }
             });
+            updateStatusFeed();
         }
 
         function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
 
-        // Muat data saat pertama kali aplikasi dibuka
-        window.onload = async () => {
-            await fetchDataOnline();
-        };
+        function playTrack(url, title) {
+            const audio = document.getElementById('bgMusic'); audio.src = url;
+            document.getElementById('trackTitle').innerText = title;
+            audio.play(); document.getElementById('playBtn').innerText = '⏸';
+        }
+
+        function toggleMusic() {
+            const audio = document.getElementById('bgMusic');
+            if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = '⏸'; }
+            else { audio.pause(); document.getElementById('playBtn').innerText = '▶'; }
+        }
+
+        window.onload = async () => { await fetchDataOnline(); };
     </script>
 </body>
 </html>
